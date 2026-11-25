@@ -1,0 +1,195 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import Transicion from '../components/Transicion.astro';
+
+const { titulo = 'Andrés Freire' } = Astro.props;
+const ruta = Astro.url.pathname;
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{titulo}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+    <ClientRouter />
+  </head>
+
+  <body>
+    <Transicion />
+
+    <div class="contenedor">
+      <aside class="menu">
+        <a href="/" class="nombre" data-astro-reload aria-label="Andrés Freire">
+          <img src="/logo.png" alt="Andrés Freire" class="menu-logo" />
+        </a>
+
+        <ul class="navegacion">
+          <li><a href="/fotografia" class={ruta === '/fotografia' ? 'activo' : ''}>Fotografía</a></li>
+          <li><a href="/videoclip" class={ruta === '/videoclip' ? 'activo' : ''}>Videoclip</a></li>
+          <li><a href="/musica" class={ruta === '/musica' ? 'activo' : ''}>Música</a></li>
+          <li><a href="/cortometrajes" class={ruta === '/cortometrajes' ? 'activo' : ''}>Cortometrajes</a></li>
+          <li><a href="/media-online" class={ruta === '/media-online' ? 'activo' : ''}>Media online</a></li>
+          <li><a href="/bio" class={ruta === '/bio' ? 'activo' : ''}>Bio</a></li>
+        </ul>
+      </aside>
+
+      <main class="galeria">
+        <slot />
+      </main>
+    </div>
+
+    <div id="cargador-contenido" class="cargador-contenido" transition:persist aria-hidden="true">
+      <div class="cargador-pista">
+        <div class="cargador-barra"></div>
+      </div>
+    </div>
+
+    <style is:global>
+      .menu .nombre {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .menu-logo {
+        display: block;
+        width: 110px;
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+        transition: opacity 0.2s ease;
+      }
+
+      .menu .nombre:hover .menu-logo {
+        opacity: 0.7;
+      }
+
+      /* Mantiene el menú izquierdo y el fondo completamente estáticos */
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation: none !important;
+      }
+
+      /* Aparición lenta y suave del contenido nuevo */
+      .galeria {
+        opacity: 1;
+        transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: opacity;
+      }
+
+      /* Ocultación del contenido mientras está la barra de carga */
+      html.cargando-contenido .galeria {
+        opacity: 0 !important;
+        transition: opacity 0.25s ease !important;
+        pointer-events: none;
+      }
+
+      /* Barra de carga centrada únicamente en el área de contenido */
+      .cargador-contenido {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.35s ease, visibility 0.35s ease;
+        z-index: 60;
+      }
+
+      html.cargando-contenido .cargador-contenido {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .cargador-pista {
+        width: 140px;
+        height: 2px;
+        background-color: rgba(17, 17, 17, 0.15);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .cargador-barra {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 45%;
+        background-color: #111111;
+        animation: deslizar-barra-contenido 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+
+      @keyframes deslizar-barra-contenido {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(240%);
+        }
+      }
+    </style>
+
+    <script is:inline>
+      if (!window.__navegacionCategoriasLista) {
+        window.__navegacionCategoriasLista = true;
+
+        const TIEMPO_ESPERA_MS = 1500;
+
+        document.addEventListener('astro:before-preparation', (event) => {
+          const destino = event.to ? event.to.pathname : '';
+          const actual = window.location.pathname;
+
+          if (!destino || destino === '/' || actual === '/' || destino === actual) {
+            return;
+          }
+
+          clearTimeout(window.__timerEntradaContenido);
+
+          const galeria = document.querySelector('.galeria');
+          const cargador = document.getElementById('cargador-contenido');
+
+          if (galeria && cargador) {
+            const rect = galeria.getBoundingClientRect();
+            cargador.style.left = rect.left + 'px';
+            cargador.style.top = Math.max(0, rect.top) + 'px';
+          }
+
+          document.documentElement.classList.add('cargando-contenido');
+
+          const cargaOriginal = event.loader;
+          event.loader = async () => {
+            await Promise.all([
+              cargaOriginal(),
+              new Promise((resolve) => {
+                setTimeout(resolve, TIEMPO_ESPERA_MS);
+              }),
+            ]);
+          };
+        });
+
+        document.addEventListener('astro:before-swap', (event) => {
+          if (document.documentElement.classList.contains('cargando-contenido')) {
+            event.newDocument.documentElement.classList.add('cargando-contenido');
+          }
+        });
+
+        document.addEventListener('astro:page-load', () => {
+          if (!document.documentElement.classList.contains('cargando-contenido')) return;
+
+          window.__timerEntradaContenido = setTimeout(() => {
+            document.documentElement.classList.remove('cargando-contenido');
+          }, 120);
+        });
+      }
+    </script>
+  </body>
+</html>

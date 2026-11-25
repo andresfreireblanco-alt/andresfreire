@@ -1,0 +1,569 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+
+import foto1 from '../assets/foto1.jpg';
+import foto4 from '../assets/foto4.jpg';
+import foto5 from '../assets/foto5.jpg';
+import foto6 from '../assets/foto6.jpg';
+import foto7 from '../assets/foto7.jpg';
+import foto8 from '../assets/foto8.jpg';
+import foto9 from '../assets/foto9.jpg';
+import foto2 from '../assets/foto2.jpg';
+import foto3 from '../assets/foto3.jpg';
+import foto10 from '../assets/foto10.jpg';
+import foto11 from '../assets/foto11.jpg';
+import foto12 from '../assets/foto12.jpg';
+import foto13 from '../assets/foto13.jpg';
+import foto14 from '../assets/foto14.jpg';
+import foto15 from '../assets/foto15.jpg';
+import foto16 from '../assets/foto16.jpg';
+import foto17 from '../assets/foto17.jpg';
+import foto18 from '../assets/foto18.jpg';
+import foto19 from '../assets/foto19.jpg';
+import foto20 from '../assets/20.jpg';
+import foto21 from '../assets/21.jpg';
+import foto22 from '../assets/22.jpg';
+import foto23 from '../assets/23.jpg';
+import foto24 from '../assets/24.jpg';
+import foto25 from '../assets/25.jpg';
+import foto26 from '../assets/26.jpg';
+import foto27 from '../assets/27.jpg';
+
+const listaBase = [
+  { imagen: foto1, alt: 'Descripción de la primera obra' },
+  { imagen: foto4, alt: 'Descripción de la cuarta obra' },
+  { imagen: foto5, alt: 'Descripción de la quinta obra' },
+  { imagen: foto6, alt: 'Descripción de la sexta obra' },
+  { imagen: foto7, alt: 'Descripción de la séptima obra' },
+  { imagen: foto8, alt: 'Descripción de la octava obra' },
+  { imagen: foto9, alt: 'Descripción de la novena obra' },
+  { imagen: foto2, alt: 'Descripción de la segunda obra' },
+  { imagen: foto3, alt: 'Descripción de la tercera obra' },
+  { imagen: foto10, alt: 'Descripción de la décima obra' },
+  { imagen: foto11, alt: 'Descripción de la undécima obra' },
+  { imagen: foto12, alt: 'Descripción de la duodécima obra' },
+  { imagen: foto13, alt: 'Descripción de la decimotercera obra' },
+  { imagen: foto14, alt: 'Descripción de la decimocuarta obra' },
+  { imagen: foto15, alt: 'Descripción de la decimoquinta obra' },
+  { imagen: foto16, alt: 'Descripción de la decimosexta obra' },
+  { imagen: foto17, alt: 'Descripción de la decimoseptima obra' },
+  { imagen: foto18, alt: 'Descripción de la decimoctava obra' },
+  { imagen: foto19, alt: 'Descripción de la decimonovena obra' },
+  { imagen: foto20, alt: 'Descripción de la vigésima obra' },
+  { imagen: foto21, alt: 'Descripción de la vigésima primera obra' },
+  { imagen: foto22, alt: 'Descripción de la vigésima segunda obra' },
+  { imagen: foto23, alt: 'Descripción de la vigésima tercera obra' },
+  { imagen: foto24, alt: 'Descripción de la vigésima cuarta obra' },
+  { imagen: foto25, alt: 'Descripción de la vigésima quinta obra' },
+  { imagen: foto26, alt: 'Descripción de la vigésima sexta obra' },
+  { imagen: foto27, alt: 'Descripción de la vigésima séptima obra' },
+];
+
+const obras = listaBase.map((obra, index) => {
+  const numero = String(index + 1).padStart(2, '0');
+  return {
+    ...obra,
+    numero,
+    etiqueta: 'Ver fotografía ' + numero + ' en pantalla completa',
+  };
+});
+
+const totalObras = String(obras.length).padStart(2, '0');
+
+const datosVisor = obras.map((obra) => ({
+  numero: obra.numero,
+  src: obra.imagen.src,
+  alt: obra.alt,
+}));
+
+const datosVisorJSON = JSON.stringify(datosVisor);
+---
+
+<BaseLayout titulo="Andrés Freire — Fotografía">
+  <div class="foto-barra-superior">
+    <div class="foto-controles" role="group" aria-label="Modo de visualización">
+      <!-- Figura 1: Rectángulo único (Vista en serie) -->
+      <button
+        type="button"
+        id="btn-vista-serie"
+        class="foto-btn-vista activo"
+        aria-pressed="true"
+        aria-label="Vista en serie"
+        title="Serie"
+      >
+        <svg class="foto-figura" width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="2" y="2" width="12" height="12" stroke="currentColor" stroke-width="1.3" />
+        </svg>
+      </button>
+
+      <!-- Figura 2: Cuadrícula 2x2 (Vista en índice / hoja de contactos) -->
+      <button
+        type="button"
+        id="btn-vista-indice"
+        class="foto-btn-vista"
+        aria-pressed="false"
+        aria-label="Vista en índice"
+        title="Índice"
+      >
+        <svg class="foto-figura" width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="2" y="2" width="4.8" height="4.8" stroke="currentColor" stroke-width="1.3" />
+          <rect x="9.2" y="2" width="4.8" height="4.8" stroke="currentColor" stroke-width="1.3" />
+          <rect x="2" y="9.2" width="4.8" height="4.8" stroke="currentColor" stroke-width="1.3" />
+          <rect x="9.2" y="9.2" width="4.8" height="4.8" stroke="currentColor" stroke-width="1.3" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Vista 1: Recorrido vertical -->
+  <div id="vista-serie">
+    {obras.map((obra, index) => (
+      <figure class="obra" data-indice={index} role="button" tabindex="0">
+        <Image
+          src={obra.imagen}
+          alt={obra.alt}
+          width={1600}
+          quality={85}
+          loading={index < 4 ? 'eager' : 'lazy'}
+          fetchpriority={index === 0 ? 'high' : undefined}
+        />
+      </figure>
+    ))}
+  </div>
+
+  <!-- Vista 2: Hoja de contactos -->
+  <div id="vista-indice" class="foto-grid-indice oculto" aria-hidden="true">
+    {obras.map((obra, index) => (
+      <figure class="foto-item-indice">
+        <button
+          type="button"
+          class="foto-disparador-indice"
+          data-indice={index}
+          aria-label={obra.etiqueta}
+        >
+          <div class="foto-marco-miniatura">
+            <Image src={obra.imagen} alt={obra.alt} width={420} quality={80} />
+          </div>
+          <figcaption class="foto-numero">{obra.numero}</figcaption>
+        </button>
+      </figure>
+    ))}
+  </div>
+
+  <!-- Visor a pantalla completa -->
+  <div id="visor-fotografia" class="visor-overlay" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="visor-superior">
+      <span id="visor-contador" class="visor-texto">01 / {totalObras}</span>
+      <button type="button" id="visor-cerrar" class="visor-btn">Cerrar</button>
+    </div>
+
+    <div class="visor-escenario" id="visor-escenario">
+      <div id="visor-zona-izq" class="visor-zona-clic" aria-hidden="true"></div>
+      <img id="visor-imagen" class="visor-img" src="" alt="" />
+      <div id="visor-zona-der" class="visor-zona-clic" aria-hidden="true"></div>
+    </div>
+
+    <div class="visor-inferior">
+      <button type="button" id="visor-anterior" class="visor-btn">Anterior</button>
+      <button type="button" id="visor-siguiente" class="visor-btn">Siguiente</button>
+    </div>
+  </div>
+
+  <script id="datos-visor-json" type="application/json" set:html={datosVisorJSON}></script>
+</BaseLayout>
+
+<style>
+  /* Selector geométrico superior igualado con Videoclip y Media online */
+  .foto-barra-superior {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2.2rem;
+  }
+
+  .foto-controles {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .foto-btn-vista {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #111111;
+    opacity: 0.32;
+    cursor: pointer;
+    transition: opacity 0.25s ease;
+  }
+
+  .foto-btn-vista:hover {
+    opacity: 0.72;
+  }
+
+  .foto-btn-vista.activo {
+    opacity: 1;
+  }
+
+  .foto-figura {
+    display: block;
+    width: 15px;
+    height: 15px;
+  }
+
+  #vista-serie,
+  .foto-grid-indice {
+    transition: opacity 0.25s ease;
+  }
+
+  #vista-serie.cambiando,
+  .foto-grid-indice.cambiando {
+    opacity: 0;
+  }
+
+  /* Efecto sutil al pasar el ratón por las obras en la vista Serie */
+  #vista-serie .obra img {
+    transition: opacity 0.3s ease;
+  }
+
+  #vista-serie .obra:hover img {
+    opacity: 0.92;
+  }
+
+  /* Vista Índice (Hoja de contactos) */
+  .foto-grid-indice {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: 2.4rem 1.8rem;
+    align-items: end;
+    padding-bottom: 4rem;
+  }
+
+  .foto-item-indice {
+    margin: 0;
+  }
+
+  .foto-disparador-indice {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: 0;
+    background: none;
+    border: none;
+    text-align: left;
+  }
+
+  .foto-marco-miniatura {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    overflow: hidden;
+  }
+
+  .foto-marco-miniatura img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    transition: opacity 0.25s ease;
+  }
+
+  .foto-disparador-indice:hover .foto-marco-miniatura img {
+    opacity: 0.65;
+  }
+
+  .foto-numero {
+    margin-top: 0.55rem;
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+    color: #111111;
+    opacity: 0.45;
+  }
+
+  .oculto {
+    display: none !important;
+  }
+
+  /* Visor a pantalla completa */
+  .visor-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background-color: #f8f2ef;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(1.2rem, 3vw, 2.2rem) clamp(1.4rem, 4vw, 3rem);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.35s ease;
+  }
+
+  .visor-overlay.abierto {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+  }
+
+  .visor-superior,
+  .visor-inferior {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+  }
+
+  .visor-texto,
+  .visor-btn {
+    font-family: inherit;
+    font-size: 13.5px;
+    letter-spacing: -0.01em;
+    color: #111111;
+  }
+
+  .visor-texto {
+    opacity: 0.5;
+    user-select: none;
+  }
+
+  .visor-btn {
+    background: none;
+    border: none;
+    padding: 0.2rem 0;
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+  }
+
+  .visor-btn:hover {
+    opacity: 0.4;
+  }
+
+  .visor-escenario {
+    position: relative;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 0;
+    margin: 1rem 0;
+  }
+
+  .visor-img {
+    max-width: 86vw;
+    max-height: 78dvh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    user-select: none;
+    opacity: 1;
+    transition: opacity 0.22s ease;
+  }
+
+  .visor-img.cambiando {
+    opacity: 0;
+  }
+
+  .visor-zona-clic {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 45%;
+    z-index: 1;
+  }
+
+  #visor-zona-izq {
+    left: 0;
+  }
+
+  #visor-zona-der {
+    right: 0;
+  }
+
+  @media (max-width: 768px) {
+    .foto-grid-indice {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.8rem 1.2rem;
+    }
+
+    .visor-img {
+      max-width: 92vw;
+      max-height: 74dvh;
+    }
+  }
+</style>
+
+<script is:inline>
+  function iniciarGaleriaFotografia() {
+    const btnSerie = document.getElementById('btn-vista-serie');
+    const btnIndice = document.getElementById('btn-vista-indice');
+    const vistaSerie = document.getElementById('vista-serie');
+    const vistaIndice = document.getElementById('vista-indice');
+    const visor = document.getElementById('visor-fotografia');
+    const visorImg = document.getElementById('visor-imagen');
+    const visorContador = document.getElementById('visor-contador');
+    const btnCerrar = document.getElementById('visor-cerrar');
+    const btnAnterior = document.getElementById('visor-anterior');
+    const btnSiguiente = document.getElementById('visor-siguiente');
+    const zonaIzq = document.getElementById('visor-zona-izq');
+    const zonaDer = document.getElementById('visor-zona-der');
+    const escenario = document.getElementById('visor-escenario');
+    const scriptDatos = document.getElementById('datos-visor-json');
+
+    // Si no estamos en la página de fotografía o ya se inicializó este DOM, salimos
+    if (!btnSerie || !btnIndice || !vistaSerie || !vistaIndice || !visor || !scriptDatos) {
+      return;
+    }
+    if (btnSerie.dataset.listo === '1') {
+      return;
+    }
+    btnSerie.dataset.listo = '1';
+
+    let datosVisor = [];
+    try {
+      datosVisor = JSON.parse(scriptDatos.textContent || '[]');
+    } catch {
+      datosVisor = [];
+    }
+
+    if (datosVisor.length === 0) return;
+
+    let indiceActual = 0;
+
+    const cambiarVista = (modo) => {
+      const esIndice = modo === 'indice';
+      if ((esIndice && btnIndice.classList.contains('activo')) || (!esIndice && btnSerie.classList.contains('activo'))) {
+        return;
+      }
+
+      btnSerie.classList.toggle('activo', !esIndice);
+      btnSerie.setAttribute('aria-pressed', String(!esIndice));
+      btnIndice.classList.toggle('activo', esIndice);
+      btnIndice.setAttribute('aria-pressed', String(esIndice));
+
+      const saliente = esIndice ? vistaSerie : vistaIndice;
+      const entrante = esIndice ? vistaIndice : vistaSerie;
+
+      saliente.classList.add('cambiando');
+      setTimeout(() => {
+        saliente.classList.add('oculto');
+        saliente.classList.remove('cambiando');
+        if (saliente === vistaIndice) {
+          vistaIndice.setAttribute('aria-hidden', 'true');
+        }
+
+        entrante.classList.add('cambiando');
+        entrante.classList.remove('oculto');
+        if (entrante === vistaIndice) {
+          vistaIndice.setAttribute('aria-hidden', 'false');
+        }
+
+        requestAnimationFrame(() => {
+          entrante.classList.remove('cambiando');
+        });
+      }, 160);
+    };
+
+    btnSerie.addEventListener('click', () => cambiarVista('serie'));
+    btnIndice.addEventListener('click', () => cambiarVista('indice'));
+
+    const mostrarFotoEnVisor = (nuevoIndice, conFundido = true) => {
+      indiceActual = (nuevoIndice + datosVisor.length) % datosVisor.length;
+      const item = datosVisor[indiceActual];
+      const total = String(datosVisor.length).padStart(2, '0');
+
+      if (visorContador) {
+        visorContador.textContent = item.numero + ' / ' + total;
+      }
+
+      if (!visorImg) return;
+
+      if (conFundido) {
+        visorImg.classList.add('cambiando');
+        setTimeout(() => {
+          visorImg.src = item.src;
+          visorImg.alt = item.alt;
+          visorImg.classList.remove('cambiando');
+        }, 160);
+      } else {
+        visorImg.src = item.src;
+        visorImg.alt = item.alt;
+      }
+    };
+
+    const abrirVisor = (indice) => {
+      mostrarFotoEnVisor(indice, false);
+      visor.classList.add('abierto');
+      visor.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const cerrarVisor = () => {
+      visor.classList.remove('abierto');
+      visor.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+
+    document.querySelectorAll('[data-indice]').forEach((elemento) => {
+      elemento.addEventListener('click', () => {
+        const idx = Number(elemento.getAttribute('data-indice')) || 0;
+        abrirVisor(idx);
+      });
+
+      elemento.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          const idx = Number(elemento.getAttribute('data-indice')) || 0;
+          abrirVisor(idx);
+        }
+      });
+    });
+
+    if (btnCerrar) btnCerrar.addEventListener('click', cerrarVisor);
+    if (btnAnterior) btnAnterior.addEventListener('click', () => mostrarFotoEnVisor(indiceActual - 1));
+    if (btnSiguiente) btnSiguiente.addEventListener('click', () => mostrarFotoEnVisor(indiceActual + 1));
+    if (zonaIzq) zonaIzq.addEventListener('click', () => mostrarFotoEnVisor(indiceActual - 1));
+    if (zonaDer) zonaDer.addEventListener('click', () => mostrarFotoEnVisor(indiceActual + 1));
+
+    if (escenario) {
+      escenario.addEventListener('click', (event) => {
+        if (event.target === escenario) cerrarVisor();
+      });
+    }
+
+    window.__visorFotoControl = {
+      estaAbierto: () => visor.classList.contains('abierto'),
+      anterior: () => mostrarFotoEnVisor(indiceActual - 1),
+      siguiente: () => mostrarFotoEnVisor(indiceActual + 1),
+      cerrar: cerrarVisor,
+    };
+
+    if (!window.__visorFotoTecladoRegistrado) {
+      window.__visorFotoTecladoRegistrado = true;
+      document.addEventListener('keydown', (event) => {
+        const ctrl = window.__visorFotoControl;
+        if (!ctrl || !ctrl.estaAbierto()) return;
+
+        if (event.key === 'Escape') ctrl.cerrar();
+        if (event.key === 'ArrowLeft') ctrl.anterior();
+        if (event.key === 'ArrowRight') ctrl.siguiente();
+      });
+    }
+  }
+
+  if (!window.__galeriaFotoEventoRegistrado) {
+    window.__galeriaFotoEventoRegistrado = true;
+    document.addEventListener('astro:page-load', iniciarGaleriaFotografia);
+  }
+
+  iniciarGaleriaFotografia();
+</script>

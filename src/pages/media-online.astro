@@ -1,0 +1,254 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const piezas = [
+  {
+    titulo: 'Trakatrá en Concierto',
+    etiqueta: 'Grabación del show a 2 cámaras · 30 min 58 seg',
+    año: '2026',
+    formato: 'horizontal',
+    miniatura: '/media-online/trakatra.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/CSEooWCEeq4?si=LhrTjOlg_yOmeX5G',
+  },
+  {
+    titulo: 'Generación Cruzada — Ofunkillo',
+    etiqueta: 'Podcast · 24 min 52 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gcof.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/0yVgUAthtZE',
+  },
+  {
+    titulo: 'Generación Cruzada — Sara Socas',
+    etiqueta: 'Podcast · 10 min 09 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gcss.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/NmX3CY3o-a8',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 14',
+    etiqueta: 'Podcast · 38 min 01 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc14.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/FldqZKwowiU',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 13',
+    etiqueta: 'Podcast · 28 min 04 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc13.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/V0TFwpqOnRo?si=xDOP5EDxvJlCqcM4',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 11',
+    etiqueta: 'Podcast · 13 min 44 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc11.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/W6TBE7bUnoA?si=rX6k1ZSovNdAbI_i',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 10',
+    etiqueta: 'Podcast · 56 min 54 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc10.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/5FdoynqRJN8?si=OFA0LfYc2OZOubtZ',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 09',
+    etiqueta: 'Podcast · 40 min 35 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc9.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/W4r9rxKESCI?si=OYb0Aa8VmABaIl2U',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 08',
+    etiqueta: 'Podcast · 1 h 11 min 30 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc8.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/URJK-9hwR2Q?si=2Lk2TvwFd9KpHTXp',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 06',
+    etiqueta: 'Podcast · 49 min 39 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc6.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/DreLHVPghsE?si=8lRx5gGU1z75LOmi',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 05',
+    etiqueta: 'Podcast · 45 min 49 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc5.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/xgLZmamVVe8?si=L0R6mNC516NTMuy7',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 04',
+    etiqueta: 'Podcast · 43 min 49 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc4.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/bb490ZlOga4?si=WLNi4LWpqHsmdL0s',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 03',
+    etiqueta: 'Podcast · 47 min 58 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc3.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/mM-uuni4_vQ?si=SSliwWrQMvBbfoLY',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 02',
+    etiqueta: 'Podcast · 1 h 05 min 13 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc2.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/B8ctpGRKft0?si=o8mci0D1aIYXDY9e',
+  },
+  {
+    titulo: 'Generación Cruzada — Episodio 01',
+    etiqueta: 'Podcast · 1 h 24 min 52 seg',
+    año: '2025',
+    formato: 'horizontal',
+    miniatura: '/media-online/gc1.png',
+    enlaceEmbed: '',
+    enlaceExterno: 'https://youtu.be/jPpclsCOvQU?si=LTTDDp5JNVAzgnwF',
+  },
+];
+---
+
+<BaseLayout titulo="Andrés Freire — Media online">
+  <div class="media-contenedor">
+    <section class="media-rejilla">
+      {piezas.map((pieza) => (
+        <article class="media-item">
+          <div class:list={['media-marco', `formato-${pieza.formato}`]}>
+            {pieza.enlaceEmbed ? (
+              <iframe
+                src={pieza.enlaceEmbed}
+                title={pieza.titulo}
+                loading="lazy"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            ) : pieza.enlaceExterno ? (
+              <a href={pieza.enlaceExterno} target="_blank" rel="noopener" class="media-enlace">
+                <img src={pieza.miniatura} alt={pieza.titulo} loading="lazy" />
+              </a>
+            ) : (
+              <img src={pieza.miniatura} alt={pieza.titulo} loading="lazy" />
+            )}
+          </div>
+
+          <div class="media-meta">
+            <div class="media-cabecera-item">
+              <p class="media-titulo">{pieza.titulo}</p>
+              <strong class="media-año">{pieza.año}</strong>
+            </div>
+            <p class="media-subtitulo">{pieza.etiqueta}</p>
+          </div>
+        </article>
+      ))}
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .media-contenedor {
+    width: 100%;
+    max-width: 920px;
+  }
+
+  .media-rejilla {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 2.5rem 2rem;
+    align-items: start;
+  }
+
+  .media-marco {
+    width: 100%;
+    background-color: rgba(17, 17, 17, 0.04);
+    overflow: hidden;
+  }
+
+  .media-marco.formato-horizontal {
+    aspect-ratio: 16 / 9;
+  }
+
+  .media-marco.formato-vertical {
+    aspect-ratio: 9 / 16;
+    max-width: 280px;
+  }
+
+  .media-marco.formato-cuadrado {
+    aspect-ratio: 1 / 1;
+  }
+
+  .media-marco iframe,
+  .media-marco img {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .media-enlace:hover img {
+    transform: scale(1.02);
+  }
+
+  .media-meta {
+    margin-top: 0.75rem;
+  }
+
+  .media-cabecera-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    font-size: 13px;
+    color: var(--texto, #111111);
+  }
+
+  .media-titulo {
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .media-año {
+    color: #111111;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .media-subtitulo {
+    margin: 0.2rem 0 0;
+    font-size: 12px;
+    color: var(--texto-suave, #767676);
+  }
+</style>

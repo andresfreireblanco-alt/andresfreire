@@ -1,0 +1,1821 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+
+// 1. Recoge automáticamente las imágenes de cada sección
+const globFotografiaHorizontales = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/fotografia/horizontales/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+const globFotografiaVerticales = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/fotografia/verticales/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+// Respaldo con las fotos generales de src/assets/ mientras las carpetas nuevas estén vacías
+const globFotografiaGeneral = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+const globVideoclips = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/videoclips/fotogramas/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+const globCortometrajes = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/cortometrajes/fotogramas/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+const globMediaOnline = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/media-online/fotogramas/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+const globBio = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/bio/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+// Para Música lee tanto src/assets/musica/ como las carátulas de public/portadas/
+const globMusicaAssets = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/musica/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+const globMusicaPublic = import.meta.glob('/public/portadas/*.{jpg,jpeg,png,webp}');
+
+const aRutas = (globObj: Record<string, { default: ImageMetadata }>) =>
+  Object.values(globObj).map((mod) => mod.default.src);
+
+const modsGeneral = Object.values(globFotografiaGeneral).map((mod) => mod.default);
+const todasGenerales = modsGeneral.map((img) => img.src);
+const generalHorizontales = modsGeneral
+  .filter((img) => img.width >= img.height)
+  .map((img) => img.src);
+const generalVerticales = modsGeneral
+  .filter((img) => img.height > img.width)
+  .map((img) => img.src);
+
+const seleccionHorizontales = aRutas(globFotografiaHorizontales);
+const seleccionVerticales = aRutas(globFotografiaVerticales);
+
+const fotosFotoDesktop =
+  seleccionHorizontales.length > 0
+    ? seleccionHorizontales
+    : generalHorizontales.length > 0
+      ? generalHorizontales
+      : todasGenerales;
+
+const fotosFotoMovil =
+  seleccionVerticales.length > 0
+    ? seleccionVerticales
+    : generalVerticales.length > 0
+      ? generalVerticales
+      : todasGenerales;
+
+const fotosVideoclips = aRutas(globVideoclips);
+const fotosCortos = aRutas(globCortometrajes);
+const fotosMediaOnline = aRutas(globMediaOnline);
+const fotosBio = aRutas(globBio);
+const fotosMusica = [
+  ...aRutas(globMusicaAssets),
+  ...Object.keys(globMusicaPublic).map((ruta) => ruta.replace('/public', '')),
+];
+
+const respaldo = todasGenerales.length > 0 ? todasGenerales : fotosMusica;
+const respaldoDesktop = fotosFotoDesktop.length > 0 ? fotosFotoDesktop : respaldo;
+
+// Datos flotantes para la sección Bio
+const contactoBio = [
+  {
+    id: 'correo',
+    texto: 'andresfreireblanco@gmail.com',
+    tipo: 'email',
+    valor: 'andresfreireblanco@gmail.com',
+  },
+  {
+    id: 'instagram',
+    texto: '@andres__freire ↗',
+    tipo: 'enlace',
+    valor: 'https://www.instagram.com/andres__freire',
+  },
+];
+
+const categorias = [
+  {
+    id: 'fotografia',
+    nombre: 'Fotografía',
+    url: '/fotografia',
+    flotante: false,
+    bioFlotante: false,
+    imagenes: fotosFotoMovil.length > 0 ? fotosFotoMovil : respaldo,
+    imagenesDesktop: respaldoDesktop,
+  },
+  {
+    id: 'videoclip',
+    nombre: 'Videoclip',
+    url: '/videoclip',
+    flotante: false,
+    bioFlotante: false,
+    imagenes: fotosVideoclips.length > 0 ? fotosVideoclips : respaldo,
+  },
+  {
+    id: 'musica',
+    nombre: 'Música',
+    url: '/musica',
+    flotante: true,
+    bioFlotante: false,
+    imagenes: fotosMusica.length > 0 ? fotosMusica : respaldo,
+  },
+  {
+    id: 'cortometrajes',
+    nombre: 'Cortometrajes',
+    url: '/cortometrajes',
+    flotante: false,
+    bioFlotante: false,
+    imagenes: fotosCortos.length > 0 ? fotosCortos : respaldo,
+  },
+  {
+    id: 'media-online',
+    nombre: 'Media online',
+    url: '/media-online',
+    flotante: false,
+    bioFlotante: false,
+    imagenes: fotosMediaOnline.length > 0 ? fotosMediaOnline : respaldo,
+  },
+  {
+    id: 'bio',
+    nombre: 'Bio',
+    url: '/bio',
+    flotante: false,
+    bioFlotante: true,
+    imagenes: fotosBio,
+  },
+];
+
+const listaInicial = respaldoDesktop;
+const imagenInicial =
+  listaInicial.length > 0
+    ? listaInicial[Math.floor(Math.random() * listaInicial.length)]
+    : '';
+
+const categoriasJSON = JSON.stringify(categorias);
+const contactoBioJSON = JSON.stringify(contactoBio);
+const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Andrés Freire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+      rel="stylesheet"
+    />
+    <ClientRouter />
+  </head>
+  <body class="dial-cuerpo">
+    <!-- Cortina de carga centrada únicamente al recargar -->
+    <div id="inicio-pantalla-carga" class="inicio-pantalla-carga" aria-hidden="true">
+      <div class="inicio-carga-pista">
+        <div id="inicio-carga-progreso" class="inicio-carga-progreso"></div>
+      </div>
+    </div>
+    <script is:inline>
+      if (window.__navegacionInterna) {
+        var cortina = document.getElementById('inicio-pantalla-carga');
+        if (cortina) cortina.style.display = 'none';
+      }
+    </script>
+
+    <main id="dial-pantalla" class="dial-pantalla" tabindex="0">
+      <!-- Lienzo de imágenes (a sangre, portadas flotantes en Música o contacto flotante en Bio) -->
+      <div id="dial-fondo-contenedor" class="dial-fondo-contenedor">
+        {imagenInicial && (
+          <img
+            id="dial-fondo-a"
+            src={imagenInicial}
+            alt="Andrés Freire"
+            class="dial-fondo-img visible"
+          />
+        )}
+        <img
+          id="dial-fondo-b"
+          src=""
+          alt=""
+          class="dial-fondo-img"
+          aria-hidden="true"
+        />
+        <div id="dial-veladura" class="dial-veladura" aria-hidden="true"></div>
+
+        <!-- Contenedor de portadas cuadradas que viajan por la pantalla en Música -->
+        <div id="dial-musica-flotante" class="dial-musica-flotante" aria-hidden="true"></div>
+
+        <!-- Contenedor de correo e Instagram flotantes con rastro en cascada en Bio -->
+        <div id="dial-bio-flotante" class="dial-bio-flotante" aria-hidden="true">
+          <div id="dial-bio-rastro" class="dial-bio-rastro" aria-hidden="true"></div>
+          <div id="dial-bio-activos" class="dial-bio-activos"></div>
+        </div>
+      </div>
+
+      <!-- Logo en la esquina superior izquierda -->
+      <header class="dial-cabecera">
+        <a href="/" class="dial-marca" aria-label="Andrés Freire">
+          <img src="/logo.png" alt="Andrés Freire" class="dial-logo" />
+        </a>
+      </header>
+
+      <!-- Dial giratorio en el borde derecho -->
+      <nav class="dial-zona-derecha" aria-label="Selector de secciones">
+        <div class="dial-indicador-fijo" aria-hidden="true">
+          <span class="dial-linea-aguja"></span>
+        </div>
+
+        <div id="dial-rueda" class="dial-rueda">
+          <div id="dial-anillo-muescas" class="dial-anillo-muescas" aria-hidden="true">
+            {muescas.map((angulo, idx) => (
+              <span
+                class:list={['dial-muesca', { mayor: idx % 4 === 0 }]}
+                style={`transform: rotate(${angulo}deg);`}
+              ></span>
+            ))}
+          </div>
+
+          <ul class="dial-lista">
+            {categorias.map((cat, idx) => (
+              <li
+                class:list={['dial-radio', { activo: idx === 0 }]}
+                data-index={idx}
+                style={`transform: rotate(${-idx * 22}deg);`}
+              >
+                <a
+                  href={cat.url}
+                  class="dial-opcion"
+                  data-index={idx}
+                  aria-current={idx === 0 ? 'page' : undefined}
+                >
+                  <span class="dial-num">0{idx + 1}</span>
+                  <span class="dial-texto">{cat.nombre}</span>
+                  <span class="dial-flecha" aria-hidden="true">↗</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
+    </main>
+
+    <script id="dial-datos-json" type="application/json" set:html={categoriasJSON}></script>
+    <script id="dial-bio-json" type="application/json" set:html={contactoBioJSON}></script>
+
+    <style>
+      .dial-cuerpo {
+        margin: 0;
+        overflow: hidden;
+      }
+
+      /* Cortina de carga centrada al recargar */
+      .inicio-pantalla-carga {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background-color: #f8f2ef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        pointer-events: auto;
+      }
+
+      .inicio-pantalla-carga.oculta {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .inicio-carga-pista {
+        width: min(180px, 42vw);
+        height: 1px;
+        background-color: rgba(17, 17, 17, 0.14);
+        overflow: hidden;
+      }
+
+      .inicio-carga-progreso {
+        width: 100%;
+        height: 100%;
+        background-color: #111111;
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .inicio-carga-progreso.llena {
+        transform: scaleX(1);
+      }
+
+      .dial-pantalla {
+        --dial-bg: #111111;
+        --dial-fg: #f8f2ef;
+        --dial-muesca: rgba(248, 242, 239, 0.24);
+        --dial-muesca-mayor: rgba(248, 242, 239, 0.5);
+        --dial-borde: rgba(248, 242, 239, 0.24);
+
+        --logo-fg: #f8f2ef;
+        --logo-filter: brightness(0) invert(1);
+
+        position: relative;
+        width: 100vw;
+        height: 100dvh;
+        overflow: hidden;
+        outline: none;
+        user-select: none;
+        background-color: var(--dial-bg);
+        color: var(--dial-fg);
+        transition:
+          background-color 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+          color 0.55s ease;
+      }
+
+      /* Modo papel #f8f2ef para Música y Bio */
+      .dial-pantalla.modo-claro {
+        --dial-bg: #f8f2ef;
+        --dial-fg: #111111;
+        --dial-muesca: rgba(17, 17, 17, 0.16);
+        --dial-muesca-mayor: rgba(17, 17, 17, 0.42);
+        --dial-borde: rgba(17, 17, 17, 0.16);
+
+        --logo-fg: #111111;
+        --logo-filter: none;
+      }
+
+      /* Contraste dinámico cuando la zona del logo o del dial cae sobre fondo claro */
+      .dial-pantalla.logo-sobre-claro {
+        --logo-fg: #111111;
+        --logo-filter: none;
+      }
+
+      .dial-pantalla.dial-sobre-claro {
+        --dial-fg: #111111;
+        --dial-muesca: rgba(17, 17, 17, 0.18);
+        --dial-muesca-mayor: rgba(17, 17, 17, 0.44);
+        --dial-borde: rgba(17, 17, 17, 0.18);
+      }
+
+      /* Capas de imagen */
+      .dial-fondo-contenedor {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+      }
+
+      .dial-fondo-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transform: scale(1.03);
+        transition:
+          opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+        pointer-events: none;
+      }
+
+      .dial-fondo-img.visible {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .dial-veladura {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 35% 50%,
+          rgba(17, 17, 17, 0.14) 0%,
+          rgba(17, 17, 17, 0.44) 100%
+        );
+        opacity: 1;
+        transition: opacity 0.65s ease;
+        pointer-events: none;
+      }
+
+      .dial-pantalla.modo-claro .dial-veladura {
+        opacity: 0;
+      }
+
+      /* Portadas flotantes que viajan por la pantalla en Música */
+      .dial-musica-flotante {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .dial-musica-flotante.visible {
+        opacity: 1;
+      }
+
+      :global(.flotante-slot) {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: var(--size);
+        aspect-ratio: 1 / 1;
+        touch-action: none;
+        pointer-events: none;
+        will-change: transform;
+      }
+
+      .dial-musica-flotante.visible :global(.flotante-slot) {
+        pointer-events: auto;
+      }
+
+      :global(.flotante-carta) {
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transform: scale(0.96);
+        transition:
+          opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms),
+          transform 0.55s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms);
+      }
+
+      .dial-musica-flotante.visible :global(.flotante-carta) {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      :global(.flotante-slot.arrastrando .flotante-carta) {
+        transition: opacity 0.3s ease, transform 0.2s ease;
+        transform: scale(1.03);
+      }
+
+      :global(.flotante-carta img) {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        pointer-events: none;
+        box-shadow: 0 12px 28px rgba(17, 17, 17, 0.08);
+        transition: box-shadow 0.3s ease;
+      }
+
+      :global(.flotante-slot.arrastrando .flotante-carta img) {
+        box-shadow: 0 20px 40px rgba(17, 17, 17, 0.14);
+      }
+
+      /* Elementos flotantes de Bio (correo e Instagram) con rastro multiplicado */
+      .dial-bio-flotante {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .dial-bio-flotante.visible {
+        opacity: 1;
+      }
+
+      .dial-bio-rastro,
+      .dial-bio-activos {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      :global(.bio-slot) {
+        position: absolute;
+        left: 0;
+        top: 0;
+        touch-action: none;
+        pointer-events: none;
+        will-change: transform;
+        cursor: grab;
+      }
+
+      .dial-bio-flotante.visible :global(.bio-slot) {
+        pointer-events: auto;
+      }
+
+      :global(.bio-slot.arrastrando) {
+        cursor: grabbing;
+      }
+
+      :global(.bio-pildora),
+      :global(.bio-rastro-clon) {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.85rem;
+        background-color: #f8f2ef;
+        border: 1px solid rgba(17, 17, 17, 0.18);
+        color: #111111;
+        font-family: inherit;
+        font-size: clamp(13.5px, 1.15vw, 15.5px);
+        font-weight: 400;
+        letter-spacing: -0.015em;
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+
+      :global(.bio-pildora) {
+        opacity: 0;
+        transform: scale(0.96);
+        box-shadow: 0 6px 20px rgba(17, 17, 17, 0.05);
+        transition:
+          opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms),
+          transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms),
+          border-color 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+
+      .dial-bio-flotante.visible :global(.bio-pildora) {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      :global(.bio-slot:hover .bio-pildora) {
+        border-color: rgba(17, 17, 17, 0.42);
+      }
+
+      :global(.bio-slot.arrastrando .bio-pildora) {
+        border-color: #111111;
+        box-shadow: 0 12px 28px rgba(17, 17, 17, 0.1);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      :global(.bio-estado-copia) {
+        font-size: 11px;
+        letter-spacing: 0.01em;
+        color: #111111;
+        opacity: 0.52;
+      }
+
+      :global(.bio-rastro-clon) {
+        position: absolute;
+        left: 0;
+        top: 0;
+        pointer-events: none;
+        will-change: transform, opacity;
+        border-color: rgba(17, 17, 17, 0.13);
+        box-shadow: 0 2px 10px rgba(17, 17, 17, 0.03);
+        transition:
+          opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      :global(.bio-rastro-clon.desvanecer) {
+        opacity: 0 !important;
+      }
+
+      /* Cabecera con logo */
+      .dial-cabecera {
+        position: relative;
+        z-index: 4;
+        padding: clamp(1.75rem, 3.5vw, 2.75rem) clamp(1.75rem, 4.5vw, 3.75rem);
+        pointer-events: none;
+      }
+
+      .dial-marca {
+        pointer-events: auto;
+        display: inline-flex;
+        align-items: center;
+        color: var(--logo-fg);
+        transition: opacity 0.2s ease, color 0.45s ease;
+      }
+
+      .dial-marca:hover {
+        opacity: 0.7;
+      }
+
+      .dial-logo {
+        display: block;
+        width: clamp(96px, 9.5vw, 132px);
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+        filter: var(--logo-filter);
+        transition: filter 0.45s ease;
+      }
+
+      /* Dial giratorio en el borde derecho */
+      .dial-zona-derecha {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        z-index: 5;
+        width: 350px;
+        height: 620px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        pointer-events: none;
+      }
+
+      .dial-indicador-fijo {
+        position: absolute;
+        right: 294px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        z-index: 6;
+      }
+
+      .dial-linea-aguja {
+        display: block;
+        width: 18px;
+        height: 1px;
+        background-color: var(--dial-fg);
+        transition: background-color 0.45s ease;
+      }
+
+      .dial-rueda {
+        position: absolute;
+        right: -280px;
+        top: 50%;
+        width: 560px;
+        height: 560px;
+        margin-top: -280px;
+        border-radius: 50%;
+        border: 1px solid var(--dial-borde);
+        transition: border-color 0.45s ease;
+        pointer-events: auto;
+      }
+
+      .dial-anillo-muescas {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+        pointer-events: none;
+      }
+
+      .dial-muesca {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 6px;
+        height: 1px;
+        background-color: var(--dial-muesca);
+        transform-origin: 280px center;
+        transition: background-color 0.45s ease;
+      }
+
+      .dial-muesca.mayor {
+        width: 11px;
+        background-color: var(--dial-muesca-mayor);
+      }
+
+      .dial-lista {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        inset: 0;
+      }
+
+      .dial-radio {
+        position: absolute;
+        right: 50%;
+        top: 50%;
+        width: 280px;
+        margin-top: -18px;
+        height: 36px;
+        transform-origin: right center;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding-left: 22px;
+        transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .dial-opcion {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.55rem;
+        color: var(--dial-fg);
+        opacity: 0.42;
+        transition:
+          opacity 0.35s ease,
+          color 0.45s ease,
+          transform 0.25s ease;
+        white-space: nowrap;
+      }
+
+      .dial-opcion:hover {
+        color: var(--dial-fg);
+        opacity: 0.85;
+      }
+
+      .dial-radio.activo .dial-opcion {
+        opacity: 1;
+      }
+
+      .dial-radio.activo .dial-opcion:hover {
+        transform: translateX(3px);
+      }
+
+      .dial-num {
+        font-size: 10.5px;
+        letter-spacing: 0.03em;
+        opacity: 0.65;
+      }
+
+      .dial-texto {
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: -0.02em;
+      }
+
+      .dial-radio.activo .dial-texto {
+        font-weight: 500;
+      }
+
+      .dial-flecha {
+        font-size: 14px;
+        opacity: 0;
+        transform: translate(-4px, 2px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+
+      .dial-radio.activo .dial-flecha {
+        opacity: 0.9;
+        transform: translate(0, 0);
+      }
+
+      @media (max-width: 768px) {
+        .dial-logo {
+          width: 92px;
+        }
+
+        .dial-zona-derecha {
+          width: 240px;
+          height: 440px;
+        }
+
+        .dial-indicador-fijo {
+          right: 202px;
+        }
+
+        .dial-rueda {
+          right: -190px;
+          width: 380px;
+          height: 380px;
+          margin-top: -190px;
+        }
+
+        .dial-muesca {
+          transform-origin: 190px center;
+        }
+
+        .dial-radio {
+          width: 190px;
+          padding-left: 16px;
+        }
+
+        .dial-texto {
+          font-size: 16.5px;
+        }
+
+        :global(.flotante-slot) {
+          width: var(--msize);
+        }
+
+        :global(.flotante-slot:nth-child(6)) {
+          display: none;
+        }
+
+        :global(.bio-pildora),
+        :global(.bio-rastro-clon) {
+          padding: 0.38rem 0.7rem;
+          font-size: 12.5px;
+        }
+      }
+    </style>
+
+    <script is:inline>
+      function iniciarPantallaCarga() {
+        const pantallaCarga = document.getElementById('inicio-pantalla-carga');
+        const progreso = document.getElementById('inicio-carga-progreso');
+        if (!pantallaCarga || !progreso) return;
+
+        if (window.__navegacionInterna) {
+          pantallaCarga.style.display = 'none';
+          return;
+        }
+
+        if (pantallaCarga.dataset.iniciada === '1') return;
+        pantallaCarga.dataset.iniciada = '1';
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            progreso.classList.add('llena');
+          });
+        });
+
+        setTimeout(() => {
+          pantallaCarga.classList.add('oculta');
+          setTimeout(() => {
+            pantallaCarga.style.display = 'none';
+          }, 580);
+        }, 780);
+      }
+
+      function iniciarDialPortada() {
+        const pantalla = document.getElementById('dial-pantalla');
+        const scriptDatos = document.getElementById('dial-datos-json');
+        const scriptBio = document.getElementById('dial-bio-json');
+        const anilloMuescas = document.getElementById('dial-anillo-muescas');
+        const radios = Array.from(document.querySelectorAll('.dial-radio'));
+        const fondoA = document.getElementById('dial-fondo-a');
+        const fondoB = document.getElementById('dial-fondo-b');
+        const fondoContenedor = document.getElementById('dial-fondo-contenedor');
+        const musicaFlotante = document.getElementById('dial-musica-flotante');
+        const bioFlotante = document.getElementById('dial-bio-flotante');
+        const bioRastro = document.getElementById('dial-bio-rastro');
+        const bioActivos = document.getElementById('dial-bio-activos');
+
+        if (!pantalla || !scriptDatos || !radios.length || !fondoA || !fondoB) return;
+        if (pantalla.dataset.dialListo === '1') return;
+        pantalla.dataset.dialListo = '1';
+
+        let categorias = [];
+        let contactoBio = [];
+        try {
+          categorias = JSON.parse(scriptDatos.textContent || '[]');
+          contactoBio = scriptBio ? JSON.parse(scriptBio.textContent || '[]') : [];
+        } catch {
+          return;
+        }
+        if (!categorias.length) return;
+
+        let indiceActivo = 0;
+        let rotacionAcumulada = 0;
+        let capaActual = 'a';
+        let ultimaImagenMostrada = fondoA.getAttribute('src') || '';
+        let bloqueoScroll = false;
+        let inicioToqueY = 0;
+        let musicaToken = 0;
+        let rafFlotantes = null;
+        let ultimoTiempoRaf = 0;
+        let itemsFlotantes = [];
+
+        // Estado específico de los elementos flotantes de Bio
+        let bioToken = 0;
+        let rafBio = null;
+        let ultimoTiempoBio = 0;
+        let itemsBio = [];
+        let rastroZIndex = 1;
+        let activoZIndex = 200;
+        let timersRastro = [];
+
+        const PASO_GRADOS = 22;
+
+        // Análisis de luminancia para adaptar logo y dial al fondo
+        const canvasMuestreo = document.createElement('canvas');
+        canvasMuestreo.width = 48;
+        canvasMuestreo.height = 48;
+        const ctxMuestreo = canvasMuestreo.getContext('2d', { willReadFrequently: true });
+
+        const calcularLuminanciaZona = (imgEl, normX, normY, normW, normH) => {
+          if (!ctxMuestreo || !imgEl || !imgEl.complete || !imgEl.naturalWidth || !imgEl.naturalHeight) {
+            return null;
+          }
+
+          const cw = canvasMuestreo.width;
+          const ch = canvasMuestreo.height;
+          const nw = imgEl.naturalWidth;
+          const nh = imgEl.naturalHeight;
+          const escala = Math.max(cw / nw, ch / nh);
+          const drawW = nw * escala;
+          const drawH = nh * escala;
+          const offsetX = (cw - drawW) / 2;
+          const offsetY = (ch - drawH) / 2;
+
+          ctxMuestreo.clearRect(0, 0, cw, ch);
+          try {
+            ctxMuestreo.drawImage(imgEl, offsetX, offsetY, drawW, drawH);
+          } catch {
+            return null;
+          }
+
+          const x0 = Math.max(0, Math.min(cw - 1, Math.floor(normX * cw)));
+          const y0 = Math.max(0, Math.min(ch - 1, Math.floor(normY * ch)));
+          const w0 = Math.max(1, Math.min(cw - x0, Math.ceil(normW * cw)));
+          const h0 = Math.max(1, Math.min(ch - y0, Math.ceil(normH * ch)));
+
+          try {
+            const datos = ctxMuestreo.getImageData(x0, y0, w0, h0).data;
+            let suma = 0;
+            let cuenta = 0;
+            for (let i = 0; i < datos.length; i += 4) {
+              const a = datos[i + 3] / 255;
+              if (a <= 0.05) continue;
+              const r = datos[i];
+              const g = datos[i + 1];
+              const b = datos[i + 2];
+              const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) * a + 245 * (1 - a);
+              suma += lum;
+              cuenta++;
+            }
+            return cuenta > 0 ? suma / cuenta : null;
+          } catch {
+            return null;
+          }
+        };
+
+        const actualizarContrasteAdaptativo = (imgActiva = null) => {
+          const esModoClaroFijo = pantalla.classList.contains('modo-claro');
+          if (esModoClaroFijo) {
+            pantalla.classList.remove('logo-sobre-claro', 'dial-sobre-claro');
+            return;
+          }
+
+          const candidata =
+            imgActiva ||
+            (fondoB.classList.contains('visible') ? fondoB : fondoA.classList.contains('visible') ? fondoA : null);
+
+          if (!candidata) {
+            pantalla.classList.remove('logo-sobre-claro', 'dial-sobre-claro');
+            return;
+          }
+
+          const lumLogo = calcularLuminanciaZona(candidata, 0.02, 0.02, 0.24, 0.14);
+          const lumDial = calcularLuminanciaZona(candidata, 0.68, 0.22, 0.3, 0.56);
+
+          pantalla.classList.toggle('logo-sobre-claro', lumLogo !== null && lumLogo > 148);
+          pantalla.classList.toggle('dial-sobre-claro', lumDial !== null && lumDial > 152);
+        };
+
+        // Devuelve horizontales en escritorio y verticales en móvil si la categoría distingue orientación
+        const obtenerImagenesCategoria = (cat) => {
+          if (!cat) return [];
+          const esEscritorio = window.innerWidth > 768;
+          if (
+            esEscritorio &&
+            Array.isArray(cat.imagenesDesktop) &&
+            cat.imagenesDesktop.length > 0
+          ) {
+            return cat.imagenesDesktop;
+          }
+          return Array.isArray(cat.imagenes) ? cat.imagenes : [];
+        };
+
+        // Precargamos y decodificamos en segundo plano todas las portadas de Música
+        const cacheDecodificadas = new Map();
+        const precargarYDecodificar = (src) => {
+          if (!src) return Promise.resolve();
+          if (cacheDecodificadas.has(src)) return cacheDecodificadas.get(src);
+
+          const promesa = new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              if (typeof img.decode === 'function') {
+                img.decode().then(resolve).catch(resolve);
+              } else {
+                resolve();
+              }
+            };
+            img.onerror = resolve;
+            img.src = src;
+          });
+
+          cacheDecodificadas.set(src, promesa);
+          return promesa;
+        };
+
+        const catMusica = categorias.find((c) => c.flotante);
+        if (catMusica && Array.isArray(catMusica.imagenes)) {
+          catMusica.imagenes.forEach((src) => precargarYDecodificar(src));
+        }
+
+        // Posiciones iniciales repartidas por el lienzo para Música
+        const SLOTS_FLOTANTES = [
+          { x: 22, y: 28, size: 'clamp(115px, 11vw, 165px)', mx: 22, my: 24, msize: '90px' },
+          { x: 16, y: 60, size: 'clamp(135px, 14vw, 200px)', mx: 38, my: 38, msize: '104px' },
+          { x: 41, y: 46, size: 'clamp(145px, 15vw, 220px)', mx: 20, my: 54, msize: '110px' },
+          { x: 31, y: 76, size: 'clamp(105px, 10.5vw, 150px)', mx: 38, my: 70, msize: '92px' },
+          { x: 55, y: 26, size: 'clamp(100px, 10vw, 145px)', mx: 22, my: 84, msize: '84px' },
+          { x: 56, y: 70, size: 'clamp(120px, 12vw, 175px)', mx: 36, my: 85, msize: '84px' },
+        ];
+
+        const barajar = (lista) => {
+          const copia = [...lista];
+          for (let i = copia.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copia[i], copia[j]] = [copia[j], copia[i]];
+          }
+          return copia;
+        };
+
+        const detenerMotorViaje = () => {
+          if (rafFlotantes) {
+            cancelAnimationFrame(rafFlotantes);
+            rafFlotantes = null;
+          }
+        };
+
+        const aplicarPosicionItem = (item) => {
+          const halfW = item.size / 2;
+          item.el.style.transform = `translate3d(${item.x - halfW}px, ${item.y - halfW}px, 0)`;
+        };
+
+        const iniciarMotorViaje = () => {
+          detenerMotorViaje();
+          ultimoTiempoRaf = performance.now();
+
+          const paso = (ahora) => {
+            const dt = Math.min((ahora - ultimoTiempoRaf) / 1000, 0.05);
+            ultimoTiempoRaf = ahora;
+
+            if (musicaFlotante && itemsFlotantes.length > 0) {
+              const ancho = musicaFlotante.clientWidth || window.innerWidth;
+              const alto = musicaFlotante.clientHeight || window.innerHeight;
+              const esMovil = ancho <= 768;
+
+              const margenIzq = 24;
+              const margenDer = esMovil ? 165 : 250;
+              const margenSup = esMovil ? 74 : 96;
+              const margenInf = 24;
+
+              for (let i = 0; i < itemsFlotantes.length; i++) {
+                const item = itemsFlotantes[i];
+                if (item.dragging) continue;
+
+                const half = item.size / 2;
+                const minX = margenIzq + half;
+                const maxX = Math.max(minX + 10, ancho - margenDer - half);
+                const minY = margenSup + half;
+                const maxY = Math.max(minY + 10, alto - margenInf - half);
+
+                item.x += item.vx * dt;
+                item.y += item.vy * dt;
+
+                if (item.x <= minX) {
+                  if (item.x > minX - 4) item.x = minX;
+                  item.vx = Math.abs(item.vx);
+                } else if (item.x >= maxX) {
+                  if (item.x < maxX + 4) item.x = maxX;
+                  item.vx = -Math.abs(item.vx);
+                }
+
+                if (item.y <= minY) {
+                  if (item.y > minY - 4) item.y = minY;
+                  item.vy = Math.abs(item.vy);
+                } else if (item.y >= maxY) {
+                  if (item.y < maxY + 4) item.y = maxY;
+                  item.vy = -Math.abs(item.vy);
+                }
+
+                aplicarPosicionItem(item);
+              }
+            }
+
+            rafFlotantes = requestAnimationFrame(paso);
+          };
+
+          rafFlotantes = requestAnimationFrame(paso);
+        };
+
+        const conectarArrastre = (item) => {
+          let inicioX = 0;
+          let inicioY = 0;
+          let origenX = 0;
+          let origenY = 0;
+
+          item.el.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0 && e.pointerType === 'mouse') return;
+            e.stopPropagation();
+
+            item.dragging = true;
+            item.el.classList.add('arrastrando');
+            inicioX = e.clientX;
+            inicioY = e.clientY;
+            origenX = item.x;
+            origenY = item.y;
+            item.el.setPointerCapture(e.pointerId);
+          });
+
+          item.el.addEventListener('pointermove', (e) => {
+            if (!item.dragging) return;
+            e.stopPropagation();
+
+            const ancho = musicaFlotante.clientWidth || window.innerWidth;
+            const alto = musicaFlotante.clientHeight || window.innerHeight;
+            const margenBorde = item.size * 0.25;
+
+            item.x = Math.max(margenBorde, Math.min(ancho - margenBorde, origenX + (e.clientX - inicioX)));
+            item.y = Math.max(margenBorde, Math.min(alto - margenBorde, origenY + (e.clientY - inicioY)));
+            aplicarPosicionItem(item);
+          });
+
+          const soltar = (e) => {
+            if (!item.dragging) return;
+            e.stopPropagation();
+            item.dragging = false;
+            item.el.classList.remove('arrastrando');
+            if (item.el.hasPointerCapture(e.pointerId)) {
+              item.el.releasePointerCapture(e.pointerId);
+            }
+          };
+
+          item.el.addEventListener('pointerup', soltar);
+          item.el.addEventListener('pointercancel', soltar);
+          item.el.addEventListener('click', (e) => e.stopPropagation());
+          item.el.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+          item.el.addEventListener('touchend', (e) => e.stopPropagation(), { passive: true });
+        };
+
+        const ocultarMusicaFlotante = () => {
+          musicaToken += 1;
+          detenerMotorViaje();
+          itemsFlotantes = [];
+          if (musicaFlotante) {
+            musicaFlotante.classList.remove('visible');
+          }
+        };
+
+        const mostrarMusicaFlotante = async (lista) => {
+          if (!musicaFlotante || !lista || !lista.length) return;
+
+          const tokenActual = ++musicaToken;
+          ultimaImagenMostrada = '';
+          fondoA.classList.remove('visible');
+          fondoB.classList.remove('visible');
+          actualizarContrasteAdaptativo(null);
+
+          const yaVisible = musicaFlotante.classList.contains('visible');
+          if (yaVisible) {
+            musicaFlotante.classList.remove('visible');
+          }
+
+          const elegidas = barajar(lista).slice(0, SLOTS_FLOTANTES.length);
+
+          await Promise.all([
+            ...elegidas.map((src) => precargarYDecodificar(src)),
+            yaVisible ? new Promise((r) => setTimeout(r, 260)) : Promise.resolve(),
+          ]);
+
+          if (tokenActual !== musicaToken) return;
+
+          detenerMotorViaje();
+          musicaFlotante.innerHTML = '';
+          itemsFlotantes = [];
+
+          const ancho = musicaFlotante.clientWidth || window.innerWidth;
+          const alto = musicaFlotante.clientHeight || window.innerHeight;
+          const esMovil = ancho <= 768;
+
+          const anguloBase = Math.random() * Math.PI * 2;
+          const pasoAngulo = (Math.PI * 2) / elegidas.length;
+
+          elegidas.forEach((src, i) => {
+            const slotCfg = SLOTS_FLOTANTES[i];
+            const slot = document.createElement('div');
+            slot.className = 'flotante-slot';
+            slot.style.setProperty('--size', slotCfg.size);
+            slot.style.setProperty('--msize', slotCfg.msize);
+            slot.style.zIndex = String(i + 1);
+
+            const carta = document.createElement('div');
+            carta.className = 'flotante-carta';
+            carta.style.setProperty('--enter-delay', `${i * 45}ms`);
+
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = '';
+            img.draggable = false;
+
+            carta.appendChild(img);
+            slot.appendChild(carta);
+            musicaFlotante.appendChild(slot);
+
+            const rect = slot.getBoundingClientRect();
+            const sizePx = rect.width || (esMovil ? 96 : 150);
+            const pctX = (esMovil ? slotCfg.mx : slotCfg.x) + (Math.random() - 0.5) * 3;
+            const pctY = (esMovil ? slotCfg.my : slotCfg.y) + (Math.random() - 0.5) * 3;
+
+            const angulo = anguloBase + i * pasoAngulo + (Math.random() - 0.5) * 0.4;
+            const velocidad = 3.2 + Math.random() * 2.2;
+
+            const item = {
+              el: slot,
+              size: sizePx,
+              x: (pctX / 100) * ancho,
+              y: (pctY / 100) * alto,
+              vx: Math.cos(angulo) * velocidad,
+              vy: Math.sin(angulo) * velocidad,
+              dragging: false,
+            };
+
+            aplicarPosicionItem(item);
+            conectarArrastre(item);
+            itemsFlotantes.push(item);
+          });
+
+          void musicaFlotante.offsetWidth;
+          musicaFlotante.classList.add('visible');
+          iniciarMotorViaje();
+        };
+
+        // --- Motor flotante + rastro en cascada para Bio ---
+        const limpiarTimersRastro = () => {
+          timersRastro.forEach((id) => clearTimeout(id));
+          timersRastro = [];
+        };
+
+        const detenerMotorBio = () => {
+          if (rafBio) {
+            cancelAnimationFrame(rafBio);
+            rafBio = null;
+          }
+        };
+
+        const aplicarPosicionBio = (item) => {
+          const halfW = item.width / 2;
+          const halfH = item.height / 2;
+          item.el.style.transform = `translate3d(${item.x - halfW}px, ${item.y - halfH}px, 0)`;
+        };
+
+        const iniciarMotorBio = () => {
+          detenerMotorBio();
+          ultimoTiempoBio = performance.now();
+
+          const paso = (ahora) => {
+            const dt = Math.min((ahora - ultimoTiempoBio) / 1000, 0.05);
+            ultimoTiempoBio = ahora;
+
+            if (bioFlotante && itemsBio.length > 0) {
+              const ancho = bioFlotante.clientWidth || window.innerWidth;
+              const alto = bioFlotante.clientHeight || window.innerHeight;
+
+              const margenIzq = 20;
+              const margenDer = 20;
+              const margenSup = 24;
+              const margenInf = 24;
+
+              for (let i = 0; i < itemsBio.length; i++) {
+                const item = itemsBio[i];
+                if (item.dragging) continue;
+
+                const halfW = item.width / 2;
+                const halfH = item.height / 2;
+                const minX = margenIzq + halfW;
+                const maxX = Math.max(minX + 10, ancho - margenDer - halfW);
+                const minY = margenSup + halfH;
+                const maxY = Math.max(minY + 10, alto - margenInf - halfH);
+
+                item.x += item.vx * dt;
+                item.y += item.vy * dt;
+
+                if (item.x <= minX) {
+                  if (item.x > minX - 4) item.x = minX;
+                  item.vx = Math.abs(item.vx);
+                } else if (item.x >= maxX) {
+                  if (item.x < maxX + 4) item.x = maxX;
+                  item.vx = -Math.abs(item.vx);
+                }
+
+                if (item.y <= minY) {
+                  if (item.y > minY - 4) item.y = minY;
+                  item.vy = Math.abs(item.vy);
+                } else if (item.y >= maxY) {
+                  if (item.y < maxY + 4) item.y = maxY;
+                  item.vy = -Math.abs(item.vy);
+                }
+
+                aplicarPosicionBio(item);
+              }
+            }
+
+            rafBio = requestAnimationFrame(paso);
+          };
+
+          rafBio = requestAnimationFrame(paso);
+        };
+
+        const estamparClonRastro = (item, x, y, listaClones) => {
+          if (!bioRastro) return;
+
+          const clon = document.createElement('div');
+          clon.className = 'bio-rastro-clon';
+          clon.textContent = item.texto;
+          rastroZIndex = (rastroZIndex % 180) + 1;
+          clon.style.zIndex = String(rastroZIndex);
+          clon.style.opacity = '0.92';
+
+          const halfW = item.width / 2;
+          const halfH = item.height / 2;
+          clon.style.transform = `translate3d(${x - halfW}px, ${y - halfH}px, 0)`;
+
+          bioRastro.appendChild(clon);
+          listaClones.push(clon);
+
+          if (listaClones.length > 26) {
+            const masAntiguo = listaClones.shift();
+            if (masAntiguo) {
+              masAntiguo.classList.add('desvanecer');
+              const tElim = setTimeout(() => masAntiguo.remove(), 650);
+              timersRastro.push(tElim);
+            }
+          }
+
+          const total = listaClones.length;
+          listaClones.forEach((elClon, idx) => {
+            if (!elClon.classList.contains('desvanecer')) {
+              const progreso = (idx + 1) / total;
+              elClon.style.opacity = String((0.28 + progreso * 0.64).toFixed(2));
+            }
+          });
+        };
+
+        const ejecutarAccionBio = (item) => {
+          if (item.tipo === 'enlace') {
+            window.open(item.valor, '_blank', 'noopener,noreferrer');
+            return;
+          }
+
+          if (item.tipo === 'email') {
+            if (navigator.clipboard && window.isSecureContext) {
+              navigator.clipboard.writeText(item.valor).then(() => {
+                if (item.estadoEl) {
+                  item.estadoEl.textContent = 'Copiado';
+                  const rect = item.el.getBoundingClientRect();
+                  if (rect.width) item.width = rect.width;
+                  setTimeout(() => {
+                    if (item.estadoEl) {
+                      item.estadoEl.textContent = '';
+                      const rectRest = item.el.getBoundingClientRect();
+                      if (rectRest.width) item.width = rectRest.width;
+                    }
+                  }, 1500);
+                }
+              }).catch(() => {
+                window.location.href = 'mailto:' + item.valor;
+              });
+            } else {
+              window.location.href = 'mailto:' + item.valor;
+            }
+          }
+        };
+
+        const conectarInteraccionBio = (item) => {
+          let inicioX = 0;
+          let inicioY = 0;
+          let origenX = 0;
+          let origenY = 0;
+          let ultimoClonX = 0;
+          let ultimoClonY = 0;
+          let movido = false;
+          let clonesActuales = [];
+
+          item.el.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0 && e.pointerType === 'mouse') return;
+            e.stopPropagation();
+
+            item.dragging = true;
+            item.el.classList.add('arrastrando');
+            item.el.style.zIndex = String(++activoZIndex);
+
+            inicioX = e.clientX;
+            inicioY = e.clientY;
+            origenX = item.x;
+            origenY = item.y;
+            ultimoClonX = item.x;
+            ultimoClonY = item.y;
+            movido = false;
+            clonesActuales = [];
+
+            item.el.setPointerCapture(e.pointerId);
+          });
+
+          item.el.addEventListener('pointermove', (e) => {
+            if (!item.dragging || !bioFlotante) return;
+            e.stopPropagation();
+
+            const dxTotal = e.clientX - inicioX;
+            const dyTotal = e.clientY - inicioY;
+            if (!movido && Math.hypot(dxTotal, dyTotal) > 5) {
+              movido = true;
+              estamparClonRastro(item, origenX, origenY, clonesActuales);
+            }
+
+            const ancho = bioFlotante.clientWidth || window.innerWidth;
+            const alto = bioFlotante.clientHeight || window.innerHeight;
+            const margenBordeX = Math.min(40, item.width * 0.2);
+            const margenBordeY = 20;
+
+            item.x = Math.max(margenBordeX, Math.min(ancho - margenBordeX, origenX + dxTotal));
+            item.y = Math.max(margenBordeY, Math.min(alto - margenBordeY, origenY + dyTotal));
+            aplicarPosicionBio(item);
+
+            if (movido) {
+              const distDesdeUltimo = Math.hypot(item.x - ultimoClonX, item.y - ultimoClonY);
+              if (distDesdeUltimo >= 18) {
+                estamparClonRastro(item, item.x, item.y, clonesActuales);
+                ultimoClonX = item.x;
+                ultimoClonY = item.y;
+              }
+            }
+          });
+
+          const soltar = (e) => {
+            if (!item.dragging) return;
+            e.stopPropagation();
+
+            item.dragging = false;
+            item.el.classList.remove('arrastrando');
+            if (item.el.hasPointerCapture(e.pointerId)) {
+              item.el.releasePointerCapture(e.pointerId);
+            }
+
+            if (!movido) {
+              ejecutarAccionBio(item);
+              return;
+            }
+
+            const copiaRastro = [...clonesActuales];
+            clonesActuales = [];
+            copiaRastro.forEach((clon, idx) => {
+              const tFade = setTimeout(() => {
+                clon.classList.add('desvanecer');
+                const tRemove = setTimeout(() => clon.remove(), 680);
+                timersRastro.push(tRemove);
+              }, 260 + idx * 32);
+              timersRastro.push(tFade);
+            });
+          };
+
+          item.el.addEventListener('pointerup', soltar);
+          item.el.addEventListener('pointercancel', soltar);
+          item.el.addEventListener('click', (e) => e.stopPropagation());
+          item.el.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+          item.el.addEventListener('touchend', (e) => e.stopPropagation(), { passive: true });
+        };
+
+        const ocultarBioFlotante = () => {
+          bioToken += 1;
+          detenerMotorBio();
+          limpiarTimersRastro();
+          itemsBio = [];
+          if (bioFlotante) {
+            bioFlotante.classList.remove('visible');
+          }
+          if (bioRastro) {
+            bioRastro.innerHTML = '';
+          }
+        };
+
+        const mostrarBioFlotante = () => {
+          if (!bioFlotante || !bioActivos || !contactoBio.length) return;
+
+          bioToken += 1;
+          ultimaImagenMostrada = '';
+          fondoA.classList.remove('visible');
+          fondoB.classList.remove('visible');
+          actualizarContrasteAdaptativo(null);
+
+          detenerMotorBio();
+          limpiarTimersRastro();
+          if (bioRastro) bioRastro.innerHTML = '';
+          bioActivos.innerHTML = '';
+          itemsBio = [];
+          rastroZIndex = 1;
+          activoZIndex = 200;
+
+          const ancho = bioFlotante.clientWidth || window.innerWidth;
+          const alto = bioFlotante.clientHeight || window.innerHeight;
+          const esMovil = ancho <= 768;
+
+          const slotsBio = esMovil
+            ? [
+                { x: 28, y: 18, vx: 3.1, vy: 2.0 },
+                { x: 68, y: 24, vx: -2.8, vy: 2.3 },
+                { x: 34, y: 37, vx: 2.9, vy: -2.1 },
+                { x: 64, y: 46, vx: -3.2, vy: 1.9 },
+                { x: 26, y: 58, vx: 3.3, vy: -2.2 },
+                { x: 66, y: 67, vx: -2.7, vy: -2.4 },
+                { x: 35, y: 79, vx: 2.8, vy: -2.0 },
+                { x: 62, y: 88, vx: -3.0, vy: -2.3 },
+              ]
+            : [
+                { x: 16, y: 17, vx: 3.6, vy: 2.1 },
+                { x: 46, y: 14, vx: -3.1, vy: 2.5 },
+                { x: 76, y: 20, vx: -3.5, vy: 1.9 },
+                { x: 24, y: 37, vx: 3.2, vy: -2.3 },
+                { x: 56, y: 41, vx: -2.9, vy: 2.4 },
+                { x: 84, y: 38, vx: -3.4, vy: -2.0 },
+                { x: 15, y: 61, vx: 3.5, vy: -2.2 },
+                { x: 44, y: 65, vx: 2.8, vy: -2.6 },
+                { x: 74, y: 59, vx: -3.3, vy: 2.3 },
+                { x: 26, y: 83, vx: 3.1, vy: -2.4 },
+                { x: 55, y: 86, vx: -3.6, vy: -2.1 },
+                { x: 82, y: 81, vx: -2.8, vy: -2.5 },
+              ];
+
+          slotsBio.forEach((posCfg, i) => {
+            const dato = contactoBio[i % contactoBio.length];
+            const slot = document.createElement('div');
+            slot.className = 'bio-slot';
+            slot.style.zIndex = String(activoZIndex + i);
+
+            const pildora = document.createElement('div');
+            pildora.className = 'bio-pildora';
+            pildora.style.setProperty('--enter-delay', `${i * 35}ms`);
+
+            const textoSpan = document.createElement('span');
+            textoSpan.textContent = dato.texto;
+            pildora.appendChild(textoSpan);
+
+            let estadoEl = null;
+            if (dato.tipo === 'email') {
+              estadoEl = document.createElement('span');
+              estadoEl.className = 'bio-estado-copia';
+              pildora.appendChild(estadoEl);
+            }
+
+            slot.appendChild(pildora);
+            bioActivos.appendChild(slot);
+
+            const rect = slot.getBoundingClientRect();
+            const jitterX = (Math.random() - 0.5) * 2.5;
+            const jitterY = (Math.random() - 0.5) * 2.5;
+            const factorVel = 0.85 + Math.random() * 0.3;
+
+            const item = {
+              el: slot,
+              estadoEl,
+              texto: dato.texto,
+              tipo: dato.tipo,
+              valor: dato.valor,
+              width: rect.width || (esMovil ? 190 : 240),
+              height: rect.height || 36,
+              x: ((posCfg.x + jitterX) / 100) * ancho,
+              y: ((posCfg.y + jitterY) / 100) * alto,
+              vx: posCfg.vx * factorVel,
+              vy: posCfg.vy * factorVel,
+              dragging: false,
+            };
+
+            aplicarPosicionBio(item);
+            conectarInteraccionBio(item);
+            itemsBio.push(item);
+          });
+
+          activoZIndex += slotsBio.length;
+          void bioFlotante.offsetWidth;
+          bioFlotante.classList.add('visible');
+          iniciarMotorBio();
+        };
+
+        const elegirImagenAleatoria = (lista) => {
+          if (!lista || !lista.length) return '';
+          if (lista.length === 1) return lista[0];
+          const candidatas = lista.filter((src) => src !== ultimaImagenMostrada);
+          const pool = candidatas.length > 0 ? candidatas : lista;
+          return pool[Math.floor(Math.random() * pool.length)];
+        };
+
+        const cambiarFondo = (nuevaSrc) => {
+          ocultarMusicaFlotante();
+          ocultarBioFlotante();
+
+          if (!nuevaSrc) {
+            ultimaImagenMostrada = '';
+            fondoA.classList.remove('visible');
+            fondoB.classList.remove('visible');
+            actualizarContrasteAdaptativo(null);
+            return;
+          }
+
+          if (nuevaSrc === ultimaImagenMostrada) return;
+          ultimaImagenMostrada = nuevaSrc;
+
+          const entrante = capaActual === 'a' ? fondoB : fondoA;
+          const saliente = capaActual === 'a' ? fondoA : fondoB;
+          capaActual = capaActual === 'a' ? 'b' : 'a';
+
+          const precarga = new Image();
+          precarga.onload = () => {
+            entrante.src = nuevaSrc;
+            requestAnimationFrame(() => {
+              entrante.classList.add('visible');
+              saliente.classList.remove('visible');
+              actualizarContrasteAdaptativo(entrante);
+            });
+          };
+          precarga.src = nuevaSrc;
+        };
+
+        // Ajusta la foto inicial de Fotografía si se entra directamente desde móvil
+        const listaArranque = obtenerImagenesCategoria(categorias[0]);
+        if (listaArranque.length > 0 && !listaArranque.includes(ultimaImagenMostrada)) {
+          const fotoMovilInicial = elegirImagenAleatoria(listaArranque);
+          if (fotoMovilInicial) {
+            ultimaImagenMostrada = fotoMovilInicial;
+            fondoA.src = fotoMovilInicial;
+          }
+        }
+
+        if (fondoA.complete && fondoA.naturalWidth) {
+          actualizarContrasteAdaptativo(fondoA);
+        } else {
+          fondoA.addEventListener('load', () => actualizarContrasteAdaptativo(fondoA), { once: true });
+        }
+
+        const actualizarDial = (nuevoIndice, forzarNuevaFoto = true) => {
+          const total = categorias.length;
+          const normalizado = ((nuevoIndice % total) + total) % total;
+
+          let delta = normalizado - indiceActivo;
+          if (delta > total / 2) delta -= total;
+          if (delta < -total / 2) delta += total;
+          rotacionAcumulada += delta * PASO_GRADOS;
+
+          indiceActivo = normalizado;
+          const cat = categorias[indiceActivo];
+          const listaImagenes = obtenerImagenesCategoria(cat);
+          const sinImagenes = !listaImagenes || listaImagenes.length === 0;
+
+          pantalla.classList.toggle(
+            'modo-claro',
+            Boolean(cat.flotante) || Boolean(cat.bioFlotante) || sinImagenes
+          );
+          actualizarContrasteAdaptativo();
+
+          if (anilloMuescas) {
+            anilloMuescas.style.transform = `rotate(${rotacionAcumulada}deg)`;
+          }
+
+          radios.forEach((radio, idx) => {
+            let dif = idx - indiceActivo;
+            if (dif > total / 2) dif -= total;
+            if (dif < -total / 2) dif += total;
+
+            const angulo = -dif * PASO_GRADOS;
+            radio.style.transform = `rotate(${angulo}deg)`;
+            radio.classList.toggle('activo', idx === indiceActivo);
+
+            const enlace = radio.querySelector('.dial-opcion');
+            if (enlace) {
+              if (idx === indiceActivo) {
+                enlace.setAttribute('aria-current', 'page');
+              } else {
+                enlace.removeAttribute('aria-current');
+              }
+            }
+          });
+
+          if (forzarNuevaFoto) {
+            if (cat.flotante) {
+              ocultarBioFlotante();
+              mostrarMusicaFlotante(listaImagenes);
+            } else if (cat.bioFlotante) {
+              ocultarMusicaFlotante();
+              mostrarBioFlotante();
+            } else {
+              const aleatoria = elegirImagenAleatoria(listaImagenes);
+              cambiarFondo(aleatoria);
+            }
+          }
+        };
+
+        radios.forEach((radio) => {
+          const enlace = radio.querySelector('.dial-opcion');
+          if (!enlace) return;
+
+          enlace.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const idx = Number(enlace.getAttribute('data-index'));
+
+            if (idx !== indiceActivo) {
+              e.preventDefault();
+              actualizarDial(idx, true);
+            }
+          });
+        });
+
+        if (fondoContenedor) {
+          fondoContenedor.addEventListener('click', () => {
+            const cat = categorias[indiceActivo];
+            if (cat.bioFlotante) {
+              mostrarBioFlotante();
+              return;
+            }
+            const listaImagenes = obtenerImagenesCategoria(cat);
+            if (!listaImagenes || listaImagenes.length === 0) return;
+            if (cat.flotante) {
+              mostrarMusicaFlotante(listaImagenes);
+            } else {
+              const aleatoria = elegirImagenAleatoria(listaImagenes);
+              cambiarFondo(aleatoria);
+            }
+          });
+        }
+
+        // Si cambia la orientación o el ancho de ventana en Fotografía, adapta la imagen al formato
+        window.addEventListener('resize', () => {
+          const cat = categorias[indiceActivo];
+          if (!cat || cat.flotante || cat.bioFlotante) return;
+          const listaActual = obtenerImagenesCategoria(cat);
+          if (listaActual.length > 0 && !listaActual.includes(ultimaImagenMostrada)) {
+            cambiarFondo(elegirImagenAleatoria(listaActual));
+          } else {
+            actualizarContrasteAdaptativo();
+          }
+        });
+
+        pantalla.addEventListener(
+          'wheel',
+          (e) => {
+            e.preventDefault();
+            if (bloqueoScroll) return;
+            if (Math.abs(e.deltaY) < 8) return;
+
+            bloqueoScroll = true;
+            const direccion = e.deltaY > 0 ? 1 : -1;
+            actualizarDial(indiceActivo + direccion, true);
+
+            setTimeout(() => {
+              bloqueoScroll = false;
+            }, 260);
+          },
+          { passive: false }
+        );
+
+        pantalla.addEventListener(
+          'touchstart',
+          (e) => {
+            if (e.touches.length === 1) {
+              inicioToqueY = e.touches[0].clientY;
+            }
+          },
+          { passive: true }
+        );
+
+        pantalla.addEventListener(
+          'touchend',
+          (e) => {
+            if (!e.changedTouches.length) return;
+            const deltaY = inicioToqueY - e.changedTouches[0].clientY;
+            if (Math.abs(deltaY) > 35) {
+              const direccion = deltaY > 0 ? 1 : -1;
+              actualizarDial(indiceActivo + direccion, true);
+            }
+          },
+          { passive: true }
+        );
+
+        pantalla.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+            e.preventDefault();
+            actualizarDial(indiceActivo + 1, true);
+          } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            actualizarDial(indiceActivo - 1, true);
+          } else if (e.key === 'Enter') {
+            const enlaceActivo = radios[indiceActivo]?.querySelector('.dial-opcion');
+            if (enlaceActivo) {
+              e.preventDefault();
+              enlaceActivo.click();
+            }
+          }
+        });
+      }
+
+      if (!window.__dialPortadaRegistrado) {
+        window.__dialPortadaRegistrado = true;
+
+        document.addEventListener('astro:before-preparation', () => {
+          window.__navegacionInterna = true;
+        });
+
+        document.addEventListener('astro:after-swap', () => {
+          if (window.__navegacionInterna) {
+            const cortina = document.getElementById('inicio-pantalla-carga');
+            if (cortina) cortina.style.display = 'none';
+          }
+        });
+
+        document.addEventListener('astro:page-load', () => {
+          iniciarPantallaCarga();
+          iniciarDialPortada();
+        });
+      }
+
+      iniciarPantallaCarga();
+      iniciarDialPortada();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,367 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// 1. CIFRA GENERAL (edita este texto cuando quieras actualizar el contador global)
+const streamsTotales = '1,1 M';
+
+// 2. LISTA DE TUS CANCIONES (ya no llevan contador individual)
+const canciones = [
+  {
+    titulo: 'Jaliza Mix (EP)',
+    artista: 'LiL $am',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/jalizamix.jpg',
+    enlace: 'https://open.spotify.com/intl-es/album/0DOgBEuxWJ1ZxVV0GH0Q9F?si=m1EAZbbHQqaDXWKSRRv7BA'
+  },
+  {
+    titulo: 'Spring Summer Songs (EP)',
+    artista: 'mikeyyy',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/sss.jpg',
+    enlace: 'https://open.spotify.com/intl-es/album/3ojRQP8ZD88tjtfavdBQfQ?si=97pnZAz4StSMmEPEcwyOTQ'
+  },
+  {
+    titulo: 'MOR DE VRAO (EP)',
+    artista: 'DELTTA',
+    rol: 'Producción · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/deltta.png',
+    enlace: 'https://open.spotify.com/intl-es/album/74YqMV6fOK0oQYdBRIb0rL?si=C6wArrPeRxC4ghBpuHoecQ'
+  },
+  {
+    titulo: 'esta vida es un regalo (Single)',
+    artista: 'mikeyyy',
+    rol: 'Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/portada esta vida es un regalo.png',
+    enlace: 'https://open.spotify.com/intl-es/album/68KEzN2k1E0ZLcfFkFTKFH?si=0ILxuBcbQ2SUi5UIkvEuOg'
+  },
+  {
+    titulo: 'wait4u (Single)',
+    artista: 'mikeyyy',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/portada proxy.png',
+    enlace: 'https://open.spotify.com/intl-es/album/4pEreUm0F5UT0BB0bfeV7z?si=9xZsNRxoSKqsZHBmt7LX0g'
+  },
+  {
+    titulo: 'no me asusta (Single)',
+    artista: 'mikeyyy',
+    rol: 'Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/portada no me asusta.png',
+    enlace: 'https://open.spotify.com/intl-es/album/18eGaZww1KMcFOIa6sm68v?si=Vb3tuYZKSJyKRNAkFr2cww'
+  },
+  {
+    titulo: 'Bla Bla (Single)',
+    artista: 'LiL $am',
+    rol: 'Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/portada bla bla definitiva.png',
+    enlace: 'https://open.spotify.com/intl-es/album/1WGiTL4Rh1E1nYPLazMEL0?si=xoYr42jeQsWs734hVdfu4Q'
+  },
+  {
+    titulo: 'prada sport (Single)',
+    artista: 'mikeyyy',
+    rol: 'Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/portada prada sport.png',
+    enlace: 'https://open.spotify.com/intl-es/album/5OQmADUaBgm08aNypFrnIq?si=sUETFYdURvS4b00Zlz_6-Q'
+  },
+  {
+    titulo: '9to5 (Single)',
+    artista: 'mikeyyy',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/9to5 portada.png',
+    enlace: 'https://open.spotify.com/intl-es/album/39D3hdvtFT7UZx3evKLdzt?si=YmOogpX2SsOvoVxrMYSwDg'
+  },
+  {
+    titulo: 'marc jacobs (Single)',
+    artista: 'mikeyyy, Joga',
+    rol: 'Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/PORTADA MARC JACOBS.png',
+    enlace: 'https://open.spotify.com/intl-es/album/3t7BQsctMYR3udVBpMlshx?si=_jaZb41ESea44xbU_UVbEA'
+  },
+  {
+    titulo: 'let go (Single)',
+    artista: 'mikeyyy, SetríllSafDie',
+    rol: 'Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/portada nueva setrill.png',
+    enlace: 'https://open.spotify.com/intl-es/album/0dAQkpzDCQz3eCjZCpofyQ?si=rZhVxQXxTxaqRARrgxapRQ'
+  },
+  {
+    titulo: 'bloody valentine (Single)',
+    artista: 'mikeyyy',
+    rol: 'Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/portada bloody valentine.png',
+    enlace: 'https://open.spotify.com/intl-es/album/3kOzNafcKmmaNrMps7BYf5?si=Rd7Y55NeQGGtMTyNDUgN0Q'
+  },
+  {
+    titulo: 'antes de dormir (Single)',
+    artista: 'LiL $am',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/antes de dormir.png',
+    enlace: 'https://open.spotify.com/intl-es/album/0mCF9DLWzQb5ThAmkqGa3W?si=lw8iHA96RK-55ug9-PrwOQ'
+  },
+  {
+    titulo: 'NANA (Single)',
+    artista: 'mikeyyy',
+    rol: 'Grabación · Mezcla · Mastering',
+    año: '2026',
+    portada: '/portadas/portada nana.png',
+    enlace: 'https://open.spotify.com/intl-es/album/3yLak2jdXep2GavfYerKcV?si=CMPjrGzLRvezcGsfvE0LGw'
+  },
+  {
+    titulo: 'john galliano (Single)',
+    artista: 'mikeyyy',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2025',
+    portada: '/portadas/jonga.png',
+    enlace: 'https://open.spotify.com/intl-es/track/2nHdNUgsw0LS4i8dF8mVeX?si=1db0ac8673e149ae'
+  },
+  {
+    titulo: 'adoradora (Single)',
+    artista: 'LiL $am, mikeyyy',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2025',
+    portada: '/portadas/PORTADA ADORADORA.png',
+    enlace: 'https://open.spotify.com/intl-es/track/0Y3pOhB9oOOu6gfjysfriv?si=8865a63195ec424d'
+  },
+  {
+    titulo: 'slim fit (Single)',
+    artista: 'mikeyyy',
+    rol: 'Grabación · Mezcla · Mastering',
+    año: '2025',
+    portada: '/portadas/Portada _slim fit_.png',
+    enlace: 'https://open.spotify.com/intl-es/track/1mVfoATDVpqhSxIGIVi9tc?si=da085bee5aa64776'
+  },
+  {
+    titulo: 'Outro Bikiño (Single)',
+    artista: 'LiL $am',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2025',
+    portada: '/portadas/outro bikiño portada 2.png',
+    enlace: 'https://open.spotify.com/intl-es/track/754g7ilafmMifdqOibsbc2?si=01a66288d7554a1b'
+  },
+  {
+    titulo: 'no soy yo (Single)',
+    artista: 'mikeyyy',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2025',
+    portada: '/portadas/madonna.png',
+    enlace: 'https://open.spotify.com/intl-es/track/3OucCZCotfjREeojnm6YHr?si=09bcc7569a664f3c'
+  },
+  {
+    titulo: 'Check-In (Single)',
+    artista: 'mikeyyy',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2025',
+    portada: '/portadas/check in portada 1000x1000.png',
+    enlace: 'https://open.spotify.com/intl-es/track/10tUpOqnYpSjxMnFMuRBig?si=d94e8c7ec87d42ec'
+  },
+  {
+    titulo: 'DALLE DON DALLE (Single)',
+    artista: 'LiL $am',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2025',
+    portada: '/portadas/PORTADA 1000X1000.png',
+    enlace: 'https://open.spotify.com/intl-es/track/0ZfWuoFq2LztMHmfrMHMUW?si=88b9f1659d3f4cba'
+  },
+  {
+    titulo: 'JALLEJO VACILÓN (Single)',
+    artista: 'LiL $am',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2025',
+    portada: '/portadas/portada jallejo vacilón.png',
+    enlace: 'https://open.spotify.com/intl-es/track/0uUv6RKsB236YXkLkkaQf0?si=df1d588946df4a0b'
+  },
+  {
+    titulo: 'A 100 (Single)',
+    artista: 'LiL $am',
+    rol: 'Producción · Grabación · Mezcla · Mastering',
+    año: '2025',
+    portada: '/portadas/a 100 portada.png',
+    enlace: 'https://open.spotify.com/intl-es/track/6WyjKIudQvvHN4pzRoGTky?si=be748d3995f044a8'
+  },
+];
+
+// 3. LISTA DE ARTISTAS CON LOS QUE TRABAJAS
+const artistas = [
+  {
+    nombre: 'LiL $am',
+    rol: 'Producción, Grabación, Mezcla, Mastering',
+    cantidad: '14 lanzamientos',
+    enlace: 'https://open.spotify.com/intl-es/artist/0f2EzBtdsQApEtNIsY9jqs?si=SELJAvaHQhGckNk772a8hg'
+  },
+  {
+    nombre: 'Silee',
+    rol: 'Producción, Grabación, Mezcla, Mastering',
+    cantidad: '1 lanzamiento',
+    enlace: 'https://open.spotify.com/intl-es/artist/6eH9A3pUEmVUalC6CBN6iQ?si=ILiNRWVGT36yhyWF-IzJsA'
+  },
+  {
+    nombre: 'mikeyyy',
+    rol: 'Producción, Grabación, Mezcla, Mastering',
+    cantidad: '22 lanzamientos',
+    enlace: 'https://open.spotify.com/intl-es/artist/4msCMG2O0PMArFJvCNcIfY?si=IV1X_E8-Tn-F7-xX7o7-bw'
+  },
+  {
+    nombre: 'Kike Varela',
+    rol: 'Producción, Grabación',
+    cantidad: '1 lanzamiento',
+    enlace: 'https://open.spotify.com/intl-es/artist/5oC2VsmM3YWzQpx0dyyeLQ?si=YA3YtRjeTB6jI9YhxgR6vA'
+  },
+  {
+    nombre: 'Deltta',
+    rol: 'Producción, Grabación, Mezcla, Mastering',
+    cantidad: '10 lanzamientos',
+    enlace: 'https://open.spotify.com/intl-es/artist/63KnrPmJxkm9xzWFejNmZO?si=0ovOAfM7SKCA1wngJPSGmg'
+  },
+  {
+    nombre: 'C Mirazo',
+    rol: 'Producción, Mezcla, Mastering',
+    cantidad: '1 lanzamiento',
+    enlace: 'https://open.spotify.com/intl-es/artist/4gSB2ba9ZgCNvXDlpu1qaC?si=Lld3sFEiQ1KKWa2heb4mFQ'
+  },
+  {
+    nombre: 'Joga',
+    rol: 'Producción, Mezcla, Mastering',
+    cantidad: '2 lanzamientos',
+    enlace: 'https://open.spotify.com/intl-es/artist/07XeSeiPIvIFkbofrYjJm1?si=Gg_tBO6FT4mwT65ntS4qug'
+  },
+  {
+    nombre: 'SetríllSafDie',
+    rol: 'Mezcla, Mastering',
+    cantidad: '1 lanzamiento',
+    enlace: 'https://open.spotify.com/intl-es/artist/7BI0ca0Wsnq8GWg7IFvyFW?si=kSi823fmT1qlgQE_wG9xtA'
+  },
+  {
+    nombre: 'CÁLIGO',
+    rol: 'Producción, Mezcla, Mastering',
+    cantidad: '1 lanzamiento',
+    enlace: 'https://open.spotify.com/intl-es/artist/4sQ9epq66zFOE0b05m20oE?si=ay0rFBt6QaWZY1s0ag76vA'
+  },
+  {
+    nombre: '808monchi',
+    rol: 'Mezcla, Mastering',
+    cantidad: '1 lanzamiento',
+    enlace: 'https://open.spotify.com/intl-es/artist/6pa5LEqcafBdKNXna3uUZX?si=NaN5kWReQLeK_NZefs0xMQ'
+  }
+];
+---
+
+<BaseLayout titulo="Andrés Freire — Música">
+  <div class="perfil-musical">
+
+    <!-- Resumen superior con cifra global -->
+    <header class="cabecera-musical">
+      <div class="metrica">
+        <span class="metrica-numero">{streamsTotales}</span>
+        <span class="metrica-etiqueta">Streams</span>
+      </div>
+      <div class="metrica">
+        <span class="metrica-numero">{canciones.length}</span>
+        <span class="metrica-etiqueta">Créditos</span>
+      </div>
+      <div class="metrica">
+        <span class="metrica-numero">{artistas.length}</span>
+        <span class="metrica-etiqueta">Artistas</span>
+      </div>
+    </header>
+
+    <!-- Pestañas -->
+    <nav class="pestanas">
+      <button type="button" class="pestana-btn activa" data-objetivo="panel-trabajos">Trabajos</button>
+      <button type="button" class="pestana-btn" data-objetivo="panel-artistas">Artistas</button>
+    </nav>
+
+    <!-- PESTAÑA 1: Carátulas limpias sin cifras individuales -->
+    <section id="panel-trabajos" class="panel-contenido visible">
+      <div class="rejilla-discos">
+        {canciones.map((cancion) => (
+          <a href={cancion.enlace} target="_blank" rel="noopener" class="tarjeta-disco">
+            <div class="caratura-marco">
+              <img src={cancion.portada} alt={cancion.titulo} loading="lazy" />
+            </div>
+            <div class="disco-datos">
+              <div class="disco-cabecera">
+                <p class="disco-titulo">{cancion.titulo}</p>
+                <strong class="disco-año">{cancion.año}</strong>
+              </div>
+              <p class="disco-artista">{cancion.artista}</p>
+              <div class="disco-pie">
+                <span>{cancion.rol}</span>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- PESTAÑA 2: Artistas -->
+    <section id="panel-artistas" class="panel-contenido">
+      <div class="lista-artistas">
+        {artistas.map((artista) => (
+          <a href={artista.enlace} target="_blank" rel="noopener" class="fila-artista">
+            <div>
+              <p class="artista-nombre">{artista.nombre}</p>
+              <p class="texto-secundario">{artista.rol}</p>
+            </div>
+            <span class="texto-secundario">{artista.cantidad} ↗</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>
+
+<style>
+  .disco-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .disco-año {
+    color: #111111;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+</style>
+
+<script is:inline>
+  function iniciarPestanasMusica() {
+    const contenedor = document.querySelector('.perfil-musical');
+    if (!contenedor || contenedor.dataset.pestanasListas === '1') return;
+    contenedor.dataset.pestanasListas = '1';
+
+    const botones = contenedor.querySelectorAll('.pestana-btn');
+    const paneles = contenedor.querySelectorAll('.panel-contenido');
+
+    botones.forEach((boton) => {
+      boton.addEventListener('click', () => {
+        botones.forEach((b) => b.classList.remove('activa'));
+        paneles.forEach((p) => p.classList.remove('visible'));
+
+        boton.classList.add('activa');
+        const idDestino = boton.getAttribute('data-objetivo');
+        if (idDestino) {
+          document.getElementById(idDestino)?.classList.add('visible');
+        }
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', iniciarPestanasMusica);
+  iniciarPestanasMusica();
+</script>

@@ -1,0 +1,588 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+
+// Guarda tus miniaturas en src/assets/videoclips/ (cambia aquí el nombre o extensión si usas .png o .webp)
+import miniaturaRegalo from '../assets/videoclips/esta-vida-es-un-regalo.png';
+import miniaturaWait4u from '../assets/videoclips/wait4u.png';
+import miniaturaNoMeAsusta from '../assets/videoclips/no-me-asusta.png';
+import miniaturaParadiseKiss from '../assets/videoclips/paradise-kiss.png';
+import miniaturaSpringSummer from '../assets/videoclips/sssvisuals.png';
+import miniatura9to5 from '../assets/videoclips/9to5.png';
+import miniaturabv from '../assets/videoclips/bv.png';
+import miniaturanana from '../assets/videoclips/nana.png';
+import miniaturajg from '../assets/videoclips/jg.png';
+import miniaturasf from '../assets/videoclips/sf.png';
+import miniaturamakeit from '../assets/videoclips/makeit.png';
+import miniaturaoutrobk from '../assets/videoclips/outrobk.png';
+import miniaturaadoradora from '../assets/videoclips/adoradora.png';
+import miniaturadalledon from '../assets/videoclips/dalledon.png';
+import miniaturaa100 from '../assets/videoclips/a100.png';
+
+const videoclips = [
+  {
+    youtubeUrl: 'https://www.youtube.com/watch?v=soBKajQrHrg',
+    miniatura: miniaturaRegalo,
+    alt: 'esta vida es un regalo - mikeyyy',
+    pie: 'esta vida es un regalo (Visualizer) - mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2026' },
+      { rol: 'Producción completa', nombre: 'Andrés Freire' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://www.youtube.com/watch?v=86ORHkfIask',
+    miniatura: miniaturaWait4u,
+    alt: 'wait4u - mikeyyy',
+    pie: 'wait4u - mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2026' },
+      { rol: 'Producción completa', nombre: 'Andrés Freire y Manuel Vázquez' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://www.youtube.com/watch?v=PiKelMbHhwI',
+    miniatura: miniaturaNoMeAsusta,
+    alt: 'no me asusta - mikeyyy',
+    pie: 'no me asusta - mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2026' },
+      { rol: 'Dirección y Postproducción', nombre: 'Andrés Freire' },
+      { rol: 'Dirección de fotografía', nombre: 'Sergio Louzao' },
+      { rol: 'Maquillaje', nombre: 'Victoria Bellón' },
+      { rol: 'Actuaciones', nombre: 'Miguel Díaz y Nerea Lorenzo' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://www.youtube.com/watch?v=BlzVCXI6lOw',
+    miniatura: miniaturaParadiseKiss,
+    alt: 'Paradise Kiss - mikeyyy',
+    pie: 'Paradise Kiss - mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2026' },
+      { rol: 'Dirección y Postproducción', nombre: 'Andrés Freire' },
+      { rol: 'Dirección de fotografía', nombre: 'Sergio Louzao' },
+      { rol: 'Iluminación y foto fija', nombre: 'Manuel Vázquez' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://youtu.be/eWS9FgHtubQ?si=xo7iR-7U0U83IbGn',
+    miniatura: miniaturaSpringSummer,
+    alt: 'Spring Summer Songs EP Visuals - mikeyyy',
+    pie: 'Spring Summer Songs EP Visuals - mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2026' },
+      { rol: '7 visuals', nombre: 'Andrés Freire' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://youtu.be/kezXO14DOR4?si=0dpSvHSUgBDOoS85',
+    miniatura: miniatura9to5,
+    alt: '9to5 - mikeyyy',
+    pie: '9to5 - mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2026' },
+      { rol: 'Producción completa', nombre: 'Andrés Freire' },
+      { rol: 'Ayudante de dirección', nombre: 'Manuel Vázquez' },
+      { rol: 'Tomas de noche', nombre: 'Manuel Vázquez' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://youtu.be/Cifid7BvvVs?si=4JT1ZUuyavZTU1Oa',
+    miniatura: miniaturabv,
+    alt: 'Bloody Valentine - mikeyyy',
+    pie: 'Bloody Valentine - mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2026' },
+      { rol: 'Producción completa', nombre: 'Andrés Freire' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://youtu.be/wkv3tZYwE8o?si=3FU4u4_tF6zITE1g',
+    miniatura: miniaturanana,
+    alt: 'NANA - mikeyyy',
+    pie: 'NANA - mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2026' },
+      { rol: 'Producción completa', nombre: 'Andrés Freire' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://youtu.be/ZvhhENYeHhI?si=euQHbXoH8eAFiINM',
+    miniatura: miniaturajg,
+    alt: 'John Galliano - mikeyyy',
+    pie: 'John Galliano - mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2025' },
+      { rol: 'Producción completa', nombre: 'Andrés Freire' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://youtu.be/2DcHoVHZHm4?si=4haEJVY6UY79tSQg',
+    miniatura: miniaturaadoradora,
+    alt: 'Adoradora - LiL $am, mikeyyy',
+    pie: 'Adoradora - LiL $am, mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2025' },
+      { rol: 'Producción completa', nombre: 'Andrés Freire' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://youtu.be/E9Sxq3kSYkw?si=TxiftZJcpnwLr4QB',
+    miniatura: miniaturasf,
+    alt: 'slim fit - mikeyyy',
+    pie: 'slim fit - mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2025' },
+      { rol: 'Producción completa', nombre: 'Andrés Freire' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://youtu.be/vzORCesMl7Q?si=Ad0TQBVVKEH_3IyE',
+    miniatura: miniaturaoutrobk,
+    alt: 'Outro Bikiño - LiL $am',
+    pie: 'Outro Bikiño - LiL $am',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2025' },
+      { rol: 'Producción completa', nombre: 'Andrés Freire' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://youtu.be/4wQk3ekdB2I?si=2p-j6XuHulLLM7HS',
+    miniatura: miniaturadalledon,
+    alt: 'Dalle Don Dalle (Visualizer) - LiL $am',
+    pie: 'Dalle Don Dalle (Visualizer) - LiL $am',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2025' },
+      { rol: 'Producción completa', nombre: 'Andrés Freire' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://youtu.be/HP0RzauPLP4?si=86ECFSKVT3gUw4W1',
+    miniatura: miniaturamakeit,
+    alt: 'make it up to u (Visualizer) - mikeyyy',
+    pie: 'make it up to u (Visualizer) - mikeyyy',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2025' },
+      { rol: 'Producción completa', nombre: 'Andrés Freire' },
+    ],
+  },
+  {
+    youtubeUrl: 'https://youtu.be/i7-wcqT9xLk?si=2CzEvU_o2Q4Ny3zW',
+    miniatura: miniaturaa100,
+    alt: 'A 100 - LiL $am',
+    pie: 'A 100 - LiL $am',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2025' },
+      { rol: 'Cámara', nombre: 'Sergio Louzao' },
+      { rol: 'Ayudante de cámara', nombre: 'Andrés Freire' },
+      { rol: 'Postproducción', nombre: 'Andrés Freire' },
+    ],
+  },
+];
+---
+
+<BaseLayout titulo="Andrés Freire – Videoclip">
+  <div class="videoclip-contenedor">
+    <!-- Selector de vista Serie / Índice con iconos SVG -->
+    <div class="videoclip-barra-vista" role="group" aria-label="Modo de visualización">
+      <button
+        type="button"
+        class="vista-btn activa"
+        data-vista="serie"
+        aria-label="Vista en serie"
+        aria-pressed="true"
+        title="Serie"
+      >
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="2" y="2" width="12" height="12" stroke="currentColor" stroke-width="1.3" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        class="vista-btn"
+        data-vista="indice"
+        aria-label="Vista en índice"
+        aria-pressed="false"
+        title="Índice"
+      >
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="2" y="2" width="4.8" height="4.8" stroke="currentColor" stroke-width="1.3" />
+          <rect x="9.2" y="2" width="4.8" height="4.8" stroke="currentColor" stroke-width="1.3" />
+          <rect x="2" y="9.2" width="4.8" height="4.8" stroke="currentColor" stroke-width="1.3" />
+          <rect x="9.2" y="9.2" width="4.8" height="4.8" stroke="currentColor" stroke-width="1.3" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Lista / Rejilla de videoclips -->
+    <div id="videoclip-lista" class="videoclip-lista vista-serie">
+      {videoclips.map((video, index) => {
+        const panelId = 'creditos-videoclip-' + index;
+        return (
+          <article class="obra">
+            <a
+              href={video.youtubeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="video-marco video-enlace"
+              aria-label={'Ver ' + video.alt + ' en YouTube'}
+            >
+              <Image
+                src={video.miniatura}
+                alt={video.alt}
+                class="video-portada"
+                loading={index === 0 ? 'eager' : 'lazy'}
+              />
+
+              <span class="video-indicador" aria-hidden="true">
+                <svg width="10" height="11" viewBox="0 0 10 11" fill="none">
+                  <polygon points="1,1 9,5.5 1,10" fill="currentColor" />
+                </svg>
+              </span>
+            </a>
+
+            <div class="videoclip-pie-fila">
+              <p class="pie-foto">{video.pie}</p>
+
+              <button
+                type="button"
+                class="videoclip-btn-creditos"
+                aria-expanded="false"
+                aria-controls={panelId}
+              >
+                <span>Créditos</span>
+                <span class="videoclip-signo" aria-hidden="true">+</span>
+              </button>
+            </div>
+
+            <div id={panelId} class="videoclip-desplegable" aria-hidden="true">
+              <div class="videoclip-desplegable-interior">
+                <div class="videoclip-ficha">
+                  {video.sinopsis && (
+                    <p class="videoclip-sinopsis">{video.sinopsis}</p>
+                  )}
+
+                  <dl class="videoclip-creditos-lista">
+                    {video.creditos.map((linea) => (
+                      <div class="videoclip-credito-fila">
+                        <dt class="videoclip-rol">{linea.rol}</dt>
+                        <dd class="videoclip-nombre">{linea.nombre}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .videoclip-contenedor {
+    width: 100%;
+  }
+
+  /* Barra superior Serie / Índice */
+  .videoclip-barra-vista {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 2.2rem;
+  }
+
+  .vista-btn {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #111111;
+    opacity: 0.32;
+    cursor: pointer;
+    transition: opacity 0.25s ease;
+  }
+
+  .vista-btn:hover {
+    opacity: 0.72;
+  }
+
+  .vista-btn.activa {
+    opacity: 1;
+  }
+
+  .videoclip-lista {
+    transition: opacity 0.25s ease;
+  }
+
+  .videoclip-lista.cambiando {
+    opacity: 0;
+  }
+
+  /* Modo Índice: hoja de contactos en rejilla */
+  .videoclip-lista.vista-indice {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2.25rem 1.75rem;
+    align-items: start;
+  }
+
+  .videoclip-lista.vista-indice .obra {
+    margin-bottom: 0;
+    width: 100%;
+    max-width: none;
+  }
+
+  .videoclip-lista.vista-indice .video-indicador {
+    width: 24px;
+    height: 24px;
+    left: 0.65rem;
+    bottom: 0.65rem;
+  }
+
+  .videoclip-lista.vista-indice .videoclip-pie-fila {
+    margin-top: 0.6rem;
+    gap: 0.75rem;
+  }
+
+  .videoclip-lista.vista-indice .pie-foto {
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+
+  .videoclip-lista.vista-indice .videoclip-credito-fila {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .video-enlace {
+    display: block;
+    overflow: hidden;
+    background-color: #111111;
+  }
+
+  .video-portada {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+  }
+
+  .video-enlace:hover .video-portada {
+    transform: scale(1.012);
+    opacity: 0.92;
+  }
+
+  .video-indicador {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(248, 242, 239, 0.9);
+    color: #111111;
+    pointer-events: none;
+    transition: transform 0.25s ease;
+  }
+
+  .video-enlace:hover .video-indicador {
+    transform: scale(1.06);
+  }
+
+  /* Pie y desplegable de créditos */
+  .videoclip-pie-fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .videoclip-pie-fila .pie-foto {
+    margin-top: 0;
+  }
+
+  .videoclip-btn-creditos {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 12px;
+    color: var(--texto-suave);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .videoclip-btn-creditos:hover,
+  .videoclip-btn-creditos[aria-expanded="true"] {
+    color: var(--texto);
+  }
+
+  .videoclip-signo {
+    display: inline-block;
+    width: 0.6rem;
+    text-align: center;
+  }
+
+  .videoclip-desplegable {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.36s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+  }
+
+  .videoclip-desplegable.abierto {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .videoclip-desplegable-interior {
+    overflow: hidden;
+  }
+
+  .videoclip-ficha {
+    margin-top: 0.75rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid rgba(17, 17, 17, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .videoclip-sinopsis {
+    max-width: 580px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--texto);
+    opacity: 0.8;
+  }
+
+  .videoclip-creditos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .videoclip-credito-fila {
+    display: grid;
+    grid-template-columns: minmax(150px, 210px) 1fr;
+    gap: 1rem;
+    font-size: 12px;
+  }
+
+  .videoclip-rol {
+    color: var(--texto-suave);
+  }
+
+  .videoclip-nombre {
+    margin: 0;
+    color: var(--texto);
+  }
+
+  @media (max-width: 768px) {
+    .videoclip-credito-fila {
+      grid-template-columns: 1fr;
+      gap: 0.1rem;
+      margin-bottom: 0.3rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  function iniciarPaginaVideoclip() {
+    const contenedor = document.querySelector('.videoclip-contenedor');
+    const lista = document.getElementById('videoclip-lista');
+
+    if (contenedor && lista && contenedor.dataset.vistaLista !== '1') {
+      contenedor.dataset.vistaLista = '1';
+      const botonesVista = contenedor.querySelectorAll('.vista-btn');
+
+      botonesVista.forEach((boton) => {
+        boton.addEventListener('click', () => {
+          const modo = boton.getAttribute('data-vista');
+          if (!modo || boton.classList.contains('activa')) return;
+
+          botonesVista.forEach((b) => {
+            b.classList.remove('activa');
+            b.setAttribute('aria-pressed', 'false');
+          });
+          boton.classList.add('activa');
+          boton.setAttribute('aria-pressed', 'true');
+
+          lista.classList.add('cambiando');
+          setTimeout(() => {
+            lista.classList.toggle('vista-serie', modo === 'serie');
+            lista.classList.toggle('vista-indice', modo === 'indice');
+            requestAnimationFrame(() => {
+              lista.classList.remove('cambiando');
+            });
+          }, 160);
+        });
+      });
+    }
+
+    const botonesCreditos = document.querySelectorAll('.videoclip-btn-creditos');
+    botonesCreditos.forEach((boton) => {
+      if (boton.dataset.listo === '1') return;
+      boton.dataset.listo = '1';
+
+      boton.addEventListener('click', () => {
+        const panelId = boton.getAttribute('aria-controls');
+        const panel = panelId ? document.getElementById(panelId) : null;
+        const signo = boton.querySelector('.videoclip-signo');
+        if (!panel) return;
+
+        const estaAbierto = boton.getAttribute('aria-expanded') === 'true';
+        const nuevoEstado = !estaAbierto;
+
+        boton.setAttribute('aria-expanded', String(nuevoEstado));
+        panel.setAttribute('aria-hidden', String(!nuevoEstado));
+        panel.classList.toggle('abierto', nuevoEstado);
+
+        if (signo) {
+          signo.textContent = nuevoEstado ? '−' : '+';
+        }
+      });
+    });
+  }
+
+  if (!window.__videoclipEventoRegistrado) {
+    window.__videoclipEventoRegistrado = true;
+    document.addEventListener('astro:page-load', iniciarPaginaVideoclip);
+  }
+
+  iniciarPaginaVideoclip();
+</script>

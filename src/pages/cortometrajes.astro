@@ -1,0 +1,291 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+
+// Guarda la miniatura en src/assets/cortometrajes/ (cambia aquí el nombre o extensión si usas .png o .webp)
+import miniaturaSuenosFran from '../assets/cortometrajes/los-suenos-de-fran.png';
+import miniaturaEstepa from '../assets/cortometrajes/estepa.png';
+
+const cortometrajes = [
+  {
+    youtubeUrl: 'https://www.youtube.com/watch?v=fVmmFm2zjuE',
+    miniatura: miniaturaSuenosFran,
+    alt: 'Los sueños de Fran',
+    pie: 'Los sueños de Fran - Dirigido por Iago Lorenzo',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2026' },
+      { rol: 'Duración', nombre: '12 min 31 seg' },
+      { rol: 'Dirección', nombre: 'Iago Lorenzo' },
+      { rol: 'Guion', nombre: 'Iago Lorenzo, Miguel González y Sergio Louzao' },
+      { rol: 'Dirección de fotografía y Postproducción', nombre: 'Andrés Freire' },
+      { rol: 'Banda sonora original', nombre: 'Andrés Freire y Miguel Díaz' },
+      { rol: 'Fran', nombre: 'Brais Varas' },
+      { rol: 'Hombre del sueño', nombre: 'Sergio Louzao' },
+      { rol: 'Novia de Fran', nombre: 'Valeria Estévez' },
+      { rol: 'Señora', nombre: 'Rebeca Ramón-Pardo' }
+      
+    ],
+  },
+  {
+    youtubeUrl: 'https://www.youtube.com/watch?v=AH2Fi0yuX5Y',
+    miniatura: miniaturaEstepa,
+    alt: 'Estepa',
+    pie: 'Estepa - Dirigido por Victoria Bellón',
+    sinopsis: '',
+    creditos: [
+      { rol: 'Año', nombre: '2026' },
+      { rol: 'Duración', nombre: '3 min 50 seg' },
+      { rol: 'Dirección', nombre: 'Victoria Bellón' },
+      { rol: 'Cámara', nombre: 'Miguel Díaz' },
+      { rol: 'Banda sonora original', nombre: 'Andrés Freire y Victoria Bellón' },
+      { rol: 'Postproducción', nombre: 'Andrés Freire' },
+      { rol: 'Nadenka', nombre: 'Victoria Bellón' },
+      { rol: 'Budimir', nombre: 'Andrés Freire' }
+    ],
+  },
+];
+---
+
+<BaseLayout titulo="Andrés Freire – Cortometrajes">
+  {cortometrajes.map((corto, index) => {
+    const panelId = 'creditos-corto-' + index;
+    return (
+      <article class="obra">
+        <a
+          href={corto.youtubeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="video-marco video-enlace"
+          aria-label={'Ver ' + corto.alt + ' en YouTube'}
+        >
+          <Image
+            src={corto.miniatura}
+            alt={corto.alt}
+            class="video-portada"
+            loading={index === 0 ? 'eager' : 'lazy'}
+          />
+
+          <span class="video-indicador" aria-hidden="true">
+            <svg width="10" height="11" viewBox="0 0 10 11" fill="none">
+              <polygon points="1,1 9,5.5 1,10" fill="currentColor" />
+            </svg>
+          </span>
+        </a>
+
+        <div class="corto-pie-fila">
+          <p class="pie-foto">{corto.pie}</p>
+
+          <button
+            type="button"
+            class="corto-btn-creditos"
+            aria-expanded="false"
+            aria-controls={panelId}
+          >
+            <span>Créditos</span>
+            <span class="corto-signo" aria-hidden="true">+</span>
+          </button>
+        </div>
+
+        <div id={panelId} class="corto-desplegable" aria-hidden="true">
+          <div class="corto-desplegable-interior">
+            <div class="corto-ficha">
+              {corto.sinopsis && (
+                <p class="corto-sinopsis">{corto.sinopsis}</p>
+              )}
+
+              <dl class="corto-creditos-lista">
+                {corto.creditos.map((linea) => (
+                  <div class="corto-credito-fila">
+                    <dt class="corto-rol">{linea.rol}</dt>
+                    <dd class="corto-nombre">{linea.nombre}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  })}
+</BaseLayout>
+
+<style>
+  .video-enlace {
+    display: block;
+    overflow: hidden;
+    background-color: #111111;
+  }
+
+  .video-portada {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+  }
+
+  .video-enlace:hover .video-portada {
+    transform: scale(1.012);
+    opacity: 0.92;
+  }
+
+  .video-indicador {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(248, 242, 239, 0.9);
+    color: #111111;
+    pointer-events: none;
+    transition: transform 0.25s ease;
+  }
+
+  .video-enlace:hover .video-indicador {
+    transform: scale(1.06);
+  }
+
+  /* Pie y desplegable de créditos */
+  .corto-pie-fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .corto-pie-fila .pie-foto {
+    margin-top: 0;
+  }
+
+  .corto-btn-creditos {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 12px;
+    color: var(--texto-suave);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+
+  .corto-btn-creditos:hover,
+  .corto-btn-creditos[aria-expanded="true"] {
+    color: var(--texto);
+  }
+
+  .corto-signo {
+    display: inline-block;
+    width: 0.6rem;
+    text-align: center;
+  }
+
+  .corto-desplegable {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.36s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+  }
+
+  .corto-desplegable.abierto {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .corto-desplegable-interior {
+    overflow: hidden;
+  }
+
+  .corto-ficha {
+    margin-top: 0.75rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid rgba(17, 17, 17, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .corto-sinopsis {
+    max-width: 580px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--texto);
+    opacity: 0.8;
+  }
+
+  .corto-creditos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .corto-credito-fila {
+    display: grid;
+    grid-template-columns: minmax(150px, 210px) 1fr;
+    gap: 1rem;
+    font-size: 12px;
+  }
+
+  .corto-rol {
+    color: var(--texto-suave);
+  }
+
+  .corto-nombre {
+    margin: 0;
+    color: var(--texto);
+  }
+
+  @media (max-width: 768px) {
+    .corto-credito-fila {
+      grid-template-columns: 1fr;
+      gap: 0.1rem;
+      margin-bottom: 0.3rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  function iniciarPaginaCortometrajes() {
+    const botones = document.querySelectorAll('.corto-btn-creditos');
+
+    botones.forEach((boton) => {
+      if (boton.dataset.listo === '1') return;
+      boton.dataset.listo = '1';
+
+      boton.addEventListener('click', () => {
+        const panelId = boton.getAttribute('aria-controls');
+        const panel = panelId ? document.getElementById(panelId) : null;
+        const signo = boton.querySelector('.corto-signo');
+        if (!panel) return;
+
+        const estaAbierto = boton.getAttribute('aria-expanded') === 'true';
+        const nuevoEstado = !estaAbierto;
+
+        boton.setAttribute('aria-expanded', String(nuevoEstado));
+        panel.setAttribute('aria-hidden', String(!nuevoEstado));
+        panel.classList.toggle('abierto', nuevoEstado);
+
+        if (signo) {
+          signo.textContent = nuevoEstado ? '−' : '+';
+        }
+      });
+    });
+  }
+
+  if (!window.__cortometrajesEventoRegistrado) {
+    window.__cortometrajesEventoRegistrado = true;
+    document.addEventListener('astro:page-load', iniciarPaginaCortometrajes);
+  }
+
+  iniciarPaginaCortometrajes();
+</script>

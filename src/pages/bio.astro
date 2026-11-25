@@ -1,0 +1,165 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout titulo="Andrés Freire — Bio">
+  <section class="info-seccion">
+    <p>José Andrés Freire Blanco</p>
+    <p>Producción audiovisual & Producción musical</p>
+    <p>Galicia, España</p>
+    <p>dvL entertainment</p>
+
+    <div>
+      <p class="info-etiqueta">Contacto</p>
+      <p class="info-correo-fila">
+        <button
+          type="button"
+          id="btn-copiar-correo"
+          class="info-correo-btn"
+          data-correo="andresfreireblanco@gmail.com"
+          aria-label="Copiar dirección de correo electrónico"
+        >
+          andresfreireblanco@gmail.com
+        </button>
+        <span id="aviso-copiado" class="info-aviso-copiado" role="status" aria-live="polite">
+          Copiado
+        </span>
+      </p>
+      <p>
+        <a
+          href="https://www.instagram.com/andres__freire/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="info-instagram"
+        >
+          <svg
+            class="info-icono-ig"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+          <span>@andres__freire</span>
+        </a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .info-seccion {
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .info-etiqueta {
+    color: var(--texto-suave);
+  }
+
+  .info-correo-fila {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .info-correo-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+  }
+
+  .info-correo-btn:hover {
+    color: var(--texto-suave);
+  }
+
+  .info-aviso-copiado {
+    font-size: 12px;
+    color: var(--texto-suave);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .info-aviso-copiado.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .info-instagram {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .info-icono-ig {
+    display: block;
+    flex-shrink: 0;
+  }
+</style>
+
+<script is:inline>
+  function iniciarPaginaInfo() {
+    const botonCorreo = document.getElementById('btn-copiar-correo');
+    const avisoCopiado = document.getElementById('aviso-copiado');
+
+    if (!botonCorreo || !avisoCopiado) return;
+    if (botonCorreo.dataset.listo === '1') return;
+    botonCorreo.dataset.listo = '1';
+
+    let temporizadorAviso;
+
+    const copiarTexto = async (texto) => {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(texto);
+        return;
+      }
+      const areaTemporal = document.createElement('textarea');
+      areaTemporal.value = texto;
+      areaTemporal.style.position = 'fixed';
+      areaTemporal.style.opacity = '0';
+      document.body.appendChild(areaTemporal);
+      areaTemporal.select();
+      document.execCommand('copy');
+      document.body.removeChild(areaTemporal);
+    };
+
+    botonCorreo.addEventListener('click', async () => {
+      const direccion = botonCorreo.getAttribute('data-correo') || '';
+      if (!direccion) return;
+
+      try {
+        await copiarTexto(direccion);
+        clearTimeout(temporizadorAviso);
+        avisoCopiado.classList.add('visible');
+        temporizadorAviso = setTimeout(() => {
+          avisoCopiado.classList.remove('visible');
+        }, 1800);
+      } catch {
+        // Silencioso si el navegador bloquea el portapapeles
+      }
+    });
+  }
+
+  if (!window.__infoEventoRegistrado) {
+    window.__infoEventoRegistrado = true;
+    document.addEventListener('astro:page-load', iniciarPaginaInfo);
+  }
+
+  iniciarPaginaInfo();
+</script>

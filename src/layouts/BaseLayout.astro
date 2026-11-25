@@ -4,7 +4,7 @@ import { ClientRouter } from 'astro:transitions';
 import Transicion from '../components/Transicion.astro';
 
 const { titulo = 'Andrés Freire' } = Astro.props;
-const ruta = Astro.url.pathname;
+const ruta = Astro.url.pathname.replace(/\/+$/, '') || '/';
 ---
 
 <html lang="es">
@@ -67,6 +67,14 @@ const ruta = Astro.url.pathname;
 
       .menu .nombre:hover .menu-logo {
         opacity: 0.7;
+      }
+
+      /* Sección activa más oscura en el menú lateral */
+      .navegacion a.activo,
+      .navegacion a.activo:hover {
+        color: #111111;
+        opacity: 1;
+        font-weight: 500;
       }
 
       /* Mantiene el menú izquierdo y el fondo completamente estáticos */
@@ -140,6 +148,14 @@ const ruta = Astro.url.pathname;
     </style>
 
     <script is:inline>
+      function sincronizarEnlaceActivoMenu() {
+        const rutaActual = window.location.pathname.replace(/\/+$/, '') || '/';
+        document.querySelectorAll('.navegacion a').forEach((enlace) => {
+          const destino = (enlace.getAttribute('href') || '').replace(/\/+$/, '') || '/';
+          enlace.classList.toggle('activo', destino === rutaActual);
+        });
+      }
+
       if (!window.__navegacionCategoriasLista) {
         window.__navegacionCategoriasLista = true;
 
@@ -184,6 +200,8 @@ const ruta = Astro.url.pathname;
         });
 
         document.addEventListener('astro:page-load', () => {
+          sincronizarEnlaceActivoMenu();
+
           if (!document.documentElement.classList.contains('cargando-contenido')) return;
 
           window.__timerEntradaContenido = setTimeout(() => {
@@ -191,6 +209,8 @@ const ruta = Astro.url.pathname;
           }, 120);
         });
       }
+
+      sincronizarEnlaceActivoMenu();
     </script>
   </body>
 </html>

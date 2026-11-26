@@ -19,16 +19,43 @@ const globFotografiaGeneral = import.meta.glob<{ default: ImageMetadata }>(
   { eager: true }
 );
 
+// Videoclips: horizontales, verticales y respaldo en fotogramas
+const globVideoclipsHorizontales = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/videoclips/horizontales/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+const globVideoclipsVerticales = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/videoclips/verticales/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
 const globVideoclips = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/videoclips/fotogramas/*.{jpg,jpeg,png,webp}',
   { eager: true }
 );
 
+// Cortometrajes: horizontales, verticales y respaldo en fotogramas
+const globCortometrajesHorizontales = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/cortometrajes/horizontales/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+const globCortometrajesVerticales = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/cortometrajes/verticales/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
 const globCortometrajes = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/cortometrajes/fotogramas/*.{jpg,jpeg,png,webp}',
   { eager: true }
 );
 
+// Media online: horizontales, verticales y respaldo en fotogramas
+const globMediaOnlineHorizontales = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/media-online/horizontales/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+const globMediaOnlineVerticales = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/media-online/verticales/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
 const globMediaOnline = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/media-online/fotogramas/*.{jpg,jpeg,png,webp}',
   { eager: true }
@@ -49,43 +76,80 @@ const globMusicaPublic = import.meta.glob('/public/portadas/*.{jpg,jpeg,png,webp
 const aRutas = (globObj: Record<string, { default: ImageMetadata }>) =>
   Object.values(globObj).map((mod) => mod.default.src);
 
+const resolverOrientacion = (
+  globHorizontales: Record<string, { default: ImageMetadata }>,
+  globVerticales: Record<string, { default: ImageMetadata }>,
+  globBase: Record<string, { default: ImageMetadata }>,
+  respaldoGeneral: string[]
+) => {
+  const modsBase = Object.values(globBase).map((mod) => mod.default);
+  const rutasBase = modsBase.map((img) => img.src);
+  const baseHorizontales = modsBase.filter((img) => img.width >= img.height).map((img) => img.src);
+  const baseVerticales = modsBase.filter((img) => img.height > img.width).map((img) => img.src);
+
+  const selHorizontales = aRutas(globHorizontales);
+  const selVerticales = aRutas(globVerticales);
+
+  const desktop =
+    selHorizontales.length > 0
+      ? selHorizontales
+      : baseHorizontales.length > 0
+        ? baseHorizontales
+        : rutasBase.length > 0
+          ? rutasBase
+          : respaldoGeneral;
+
+  const movil =
+    selVerticales.length > 0
+      ? selVerticales
+      : baseVerticales.length > 0
+        ? baseVerticales
+        : rutasBase.length > 0
+          ? rutasBase
+          : respaldoGeneral;
+
+  return { desktop, movil };
+};
+
 const modsGeneral = Object.values(globFotografiaGeneral).map((mod) => mod.default);
 const todasGenerales = modsGeneral.map((img) => img.src);
-const generalHorizontales = modsGeneral
-  .filter((img) => img.width >= img.height)
-  .map((img) => img.src);
-const generalVerticales = modsGeneral
-  .filter((img) => img.height > img.width)
-  .map((img) => img.src);
 
-const seleccionHorizontales = aRutas(globFotografiaHorizontales);
-const seleccionVerticales = aRutas(globFotografiaVerticales);
-
-const fotosFotoDesktop =
-  seleccionHorizontales.length > 0
-    ? seleccionHorizontales
-    : generalHorizontales.length > 0
-      ? generalHorizontales
-      : todasGenerales;
-
-const fotosFotoMovil =
-  seleccionVerticales.length > 0
-    ? seleccionVerticales
-    : generalVerticales.length > 0
-      ? generalVerticales
-      : todasGenerales;
-
-const fotosVideoclips = aRutas(globVideoclips);
-const fotosCortos = aRutas(globCortometrajes);
-const fotosMediaOnline = aRutas(globMediaOnline);
-const fotosBio = aRutas(globBio);
 const fotosMusica = [
   ...aRutas(globMusicaAssets),
   ...Object.keys(globMusicaPublic).map((ruta) => ruta.replace('/public', '')),
 ];
 
 const respaldo = todasGenerales.length > 0 ? todasGenerales : fotosMusica;
-const respaldoDesktop = fotosFotoDesktop.length > 0 ? fotosFotoDesktop : respaldo;
+
+const fotoOrientada = resolverOrientacion(
+  globFotografiaHorizontales,
+  globFotografiaVerticales,
+  globFotografiaGeneral,
+  respaldo
+);
+
+const videoclipsOrientados = resolverOrientacion(
+  globVideoclipsHorizontales,
+  globVideoclipsVerticales,
+  globVideoclips,
+  respaldo
+);
+
+const cortometrajesOrientados = resolverOrientacion(
+  globCortometrajesHorizontales,
+  globCortometrajesVerticales,
+  globCortometrajes,
+  respaldo
+);
+
+const mediaOnlineOrientados = resolverOrientacion(
+  globMediaOnlineHorizontales,
+  globMediaOnlineVerticales,
+  globMediaOnline,
+  respaldo
+);
+
+const fotosBio = aRutas(globBio);
 
 // Datos flotantes para la sección Bio
 const contactoBio = [
@@ -97,7 +161,7 @@ const contactoBio = [
   },
   {
     id: 'instagram',
-    texto: '@andres__freire ↗',
+    texto: '@andres__freire',
     tipo: 'enlace',
     valor: 'https://www.instagram.com/andres__freire',
   },
@@ -110,8 +174,8 @@ const categorias = [
     url: '/fotografia',
     flotante: false,
     bioFlotante: false,
-    imagenes: fotosFotoMovil.length > 0 ? fotosFotoMovil : respaldo,
-    imagenesDesktop: respaldoDesktop,
+    imagenes: fotoOrientada.movil,
+    imagenesDesktop: fotoOrientada.desktop,
   },
   {
     id: 'videoclip',
@@ -119,7 +183,8 @@ const categorias = [
     url: '/videoclip',
     flotante: false,
     bioFlotante: false,
-    imagenes: fotosVideoclips.length > 0 ? fotosVideoclips : respaldo,
+    imagenes: videoclipsOrientados.movil,
+    imagenesDesktop: videoclipsOrientados.desktop,
   },
   {
     id: 'musica',
@@ -135,7 +200,8 @@ const categorias = [
     url: '/cortometrajes',
     flotante: false,
     bioFlotante: false,
-    imagenes: fotosCortos.length > 0 ? fotosCortos : respaldo,
+    imagenes: cortometrajesOrientados.movil,
+    imagenesDesktop: cortometrajesOrientados.desktop,
   },
   {
     id: 'media-online',
@@ -143,7 +209,8 @@ const categorias = [
     url: '/media-online',
     flotante: false,
     bioFlotante: false,
-    imagenes: fotosMediaOnline.length > 0 ? fotosMediaOnline : respaldo,
+    imagenes: mediaOnlineOrientados.movil,
+    imagenesDesktop: mediaOnlineOrientados.desktop,
   },
   {
     id: 'bio',
@@ -155,7 +222,7 @@ const categorias = [
   },
 ];
 
-const listaInicial = respaldoDesktop;
+const listaInicial = fotoOrientada.desktop;
 const imagenInicial =
   listaInicial.length > 0
     ? listaInicial[Math.floor(Math.random() * listaInicial.length)]
@@ -263,7 +330,17 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
                 >
                   <span class="dial-num">0{idx + 1}</span>
                   <span class="dial-texto">{cat.nombre}</span>
-                  <span class="dial-flecha" aria-hidden="true">↗</span>
+                  <span class="dial-flecha" aria-hidden="true">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path
+                        d="M3 9L9 3M9 3H4M9 3V8"
+                        stroke="currentColor"
+                        stroke-width="1.15"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
                 </a>
               </li>
             ))}
@@ -744,7 +821,11 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
       }
 
       .dial-flecha {
-        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 12px;
+        height: 12px;
         opacity: 0;
         transform: translate(-4px, 2px);
         transition: opacity 0.3s ease, transform 0.3s ease;
@@ -1725,7 +1806,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           });
         }
 
-        // Si cambia la orientación o el ancho de ventana en Fotografía, adapta la imagen al formato
+        // Si cambia la orientación o el ancho de ventana en categorías orientadas, adapta la imagen
         window.addEventListener('resize', () => {
           const cat = categorias[indiceActivo];
           if (!cat || cat.flotante || cat.bioFlotante) return;

@@ -232,7 +232,7 @@ const artistas = [
   },
   {
     nombre: 'Joga',
-    rol: 'Producción, Mezcla, Mastering',
+    rol: 'Producción, Grabación, Mezcla, Mastering',
     cantidad: '2 lanzamientos',
     enlace: 'https://open.spotify.com/intl-es/artist/07XeSeiPIvIFkbofrYjJm1?si=Gg_tBO6FT4mwT65ntS4qug'
   },
@@ -314,7 +314,25 @@ const artistas = [
               <p class="artista-nombre">{artista.nombre}</p>
               <p class="texto-secundario">{artista.rol}</p>
             </div>
-            <span class="texto-secundario">{artista.cantidad} ↗</span>
+            <span class="texto-secundario artista-cantidad">
+              {artista.cantidad}
+              <svg
+                class="artista-flecha"
+                width="11"
+                height="11"
+                viewBox="0 0 12 12"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 9L9 3M9 3H4M9 3V8"
+                  stroke="currentColor"
+                  stroke-width="1.15"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
           </a>
         ))}
       </div>
@@ -336,6 +354,19 @@ const artistas = [
     font-weight: 700;
     font-size: 13px;
     flex-shrink: 0;
+  }
+
+  .artista-cantidad {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .artista-flecha {
+    display: inline-block;
+    flex-shrink: 0;
+    opacity: 0.75;
   }
 </style>
 

@@ -233,7 +233,7 @@ const datosVisorJSON = JSON.stringify(datosVisor);
     opacity: 0.92;
   }
 
-  /* Vista Índice (Hoja de contactos) */
+  /* Vista Índice (Hoja de contactos): proporción natural sin recortar verticales */
   .foto-grid-indice {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
@@ -244,6 +244,7 @@ const datosVisorJSON = JSON.stringify(datosVisor);
 
   .foto-item-indice {
     margin: 0;
+    min-width: 0;
   }
 
   .foto-disparador-indice {
@@ -259,18 +260,18 @@ const datosVisorJSON = JSON.stringify(datosVisor);
 
   .foto-marco-miniatura {
     width: 100%;
-    aspect-ratio: 4 / 3;
+    min-height: 0;
     display: flex;
     align-items: flex-end;
     justify-content: flex-start;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .foto-marco-miniatura img {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
+    width: 100%;
     height: auto;
+    max-width: 100%;
+    max-height: none;
     object-fit: contain;
     display: block;
     transition: opacity 0.25s ease;
@@ -292,7 +293,7 @@ const datosVisorJSON = JSON.stringify(datosVisor);
     display: none !important;
   }
 
-  /* Visor a pantalla completa */
+  /* Visor a pantalla completa sin recorte de verticales */
   .visor-overlay {
     position: fixed;
     inset: 0;
@@ -320,6 +321,7 @@ const datosVisorJSON = JSON.stringify(datosVisor);
     justify-content: space-between;
     align-items: center;
     z-index: 2;
+    flex-shrink: 0;
   }
 
   .visor-texto,
@@ -353,13 +355,15 @@ const datosVisorJSON = JSON.stringify(datosVisor);
     display: flex;
     justify-content: center;
     align-items: center;
+    min-width: 0;
     min-height: 0;
     margin: 1rem 0;
+    touch-action: pan-y;
   }
 
   .visor-img {
     max-width: 86vw;
-    max-height: 78dvh;
+    max-height: 100%;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -397,7 +401,7 @@ const datosVisorJSON = JSON.stringify(datosVisor);
 
     .visor-img {
       max-width: 92vw;
-      max-height: 74dvh;
+      max-height: 100%;
     }
   }
 </style>
@@ -438,6 +442,9 @@ const datosVisorJSON = JSON.stringify(datosVisor);
     if (datosVisor.length === 0) return;
 
     let indiceActual = 0;
+    let inicioToqueX = 0;
+    let inicioToqueY = 0;
+    let ignorarSiguienteClic = false;
 
     const cambiarVista = (modo) => {
       const esIndice = modo === 'indice';
@@ -531,13 +538,57 @@ const datosVisorJSON = JSON.stringify(datosVisor);
     if (btnCerrar) btnCerrar.addEventListener('click', cerrarVisor);
     if (btnAnterior) btnAnterior.addEventListener('click', () => mostrarFotoEnVisor(indiceActual - 1));
     if (btnSiguiente) btnSiguiente.addEventListener('click', () => mostrarFotoEnVisor(indiceActual + 1));
-    if (zonaIzq) zonaIzq.addEventListener('click', () => mostrarFotoEnVisor(indiceActual - 1));
-    if (zonaDer) zonaDer.addEventListener('click', () => mostrarFotoEnVisor(indiceActual + 1));
+    if (zonaIzq) {
+      zonaIzq.addEventListener('click', () => {
+        if (ignorarSiguienteClic) return;
+        mostrarFotoEnVisor(indiceActual - 1);
+      });
+    }
+    if (zonaDer) {
+      zonaDer.addEventListener('click', () => {
+        if (ignorarSiguienteClic) return;
+        mostrarFotoEnVisor(indiceActual + 1);
+      });
+    }
 
     if (escenario) {
       escenario.addEventListener('click', (event) => {
+        if (ignorarSiguienteClic) return;
         if (event.target === escenario) cerrarVisor();
       });
+
+      escenario.addEventListener(
+        'touchstart',
+        (event) => {
+          if (!visor.classList.contains('abierto') || event.touches.length !== 1) return;
+          inicioToqueX = event.touches[0].clientX;
+          inicioToqueY = event.touches[0].clientY;
+        },
+        { passive: true }
+      );
+
+      escenario.addEventListener(
+        'touchend',
+        (event) => {
+          if (!visor.classList.contains('abierto') || !event.changedTouches.length) return;
+          const dx = event.changedTouches[0].clientX - inicioToqueX;
+          const dy = event.changedTouches[0].clientY - inicioToqueY;
+
+          if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+            ignorarSiguienteClic = true;
+            setTimeout(() => {
+              ignorarSiguienteClic = false;
+            }, 320);
+
+            if (dx < 0) {
+              mostrarFotoEnVisor(indiceActual + 1);
+            } else {
+              mostrarFotoEnVisor(indiceActual - 1);
+            }
+          }
+        },
+        { passive: true }
+      );
     }
 
     window.__visorFotoControl = {

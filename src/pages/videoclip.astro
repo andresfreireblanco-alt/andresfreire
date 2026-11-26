@@ -300,6 +300,7 @@ const videoclips = [
 <style>
   .videoclip-contenedor {
     width: 100%;
+    min-width: 0;
   }
 
   /* Barra superior Serie / Índice */
@@ -333,6 +334,8 @@ const videoclips = [
   }
 
   .videoclip-lista {
+    width: 100%;
+    min-width: 0;
     transition: opacity 0.25s ease;
   }
 
@@ -351,6 +354,7 @@ const videoclips = [
   .videoclip-lista.vista-indice .obra {
     margin-bottom: 0;
     width: 100%;
+    min-width: 0;
     max-width: none;
   }
 
@@ -513,6 +517,11 @@ const videoclips = [
   }
 
   @media (max-width: 768px) {
+    .videoclip-lista.vista-indice {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.6rem 1.1rem;
+    }
+
     .videoclip-credito-fila {
       grid-template-columns: 1fr;
       gap: 0.1rem;
@@ -526,11 +535,13 @@ const videoclips = [
     const contenedor = document.querySelector('.videoclip-contenedor');
     const lista = document.getElementById('videoclip-lista');
 
-    if (contenedor && lista && contenedor.dataset.vistaLista !== '1') {
-      contenedor.dataset.vistaLista = '1';
+    if (contenedor && lista) {
       const botonesVista = contenedor.querySelectorAll('.vista-btn');
 
       botonesVista.forEach((boton) => {
+        if (boton.dataset.vistaConectada === '1') return;
+        boton.dataset.vistaConectada = '1';
+
         boton.addEventListener('click', () => {
           const modo = boton.getAttribute('data-vista');
           if (!modo || boton.classList.contains('activa')) return;

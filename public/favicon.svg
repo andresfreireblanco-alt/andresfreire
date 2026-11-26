@@ -8,9 +8,16 @@
         font-family: Couture;
         font-weight: 700;
       }
+
+      .cls-2 {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 67.45px;
+        fill-rule: evenodd;
+      }
     </style>
   </defs>
   <rect id="Rectángulo_1" data-name="Rectángulo 1" width="512" height="512" rx="100" ry="100"/>
-  <text id="a" class="cls-1" transform="translate(437.085 365.013) scale(6.04)"><tspan x="0">a</tspan></text>
-  <text id="f" class="cls-1" transform="translate(282.852 156.46) rotate(-89.997) scale(5.727)"><tspan x="0">f</tspan></text>
+  <text id="a" class="cls-1" transform="translate(396.804 368.358) scale(6.93)"><tspan x="0">a</tspan></text>
+  <path id="Elipse_1" data-name="Elipse 1" class="cls-2" d="M256,93.894c90.694,0,164.216,72.577,164.216,162.106S346.694,418.106,256,418.106,91.784,345.529,91.784,256,165.306,93.894,256,93.894Z"/>
 </svg>

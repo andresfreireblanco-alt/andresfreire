@@ -14,7 +14,6 @@ const globFotografiaVerticales = import.meta.glob<{ default: ImageMetadata }>(
   { eager: true }
 );
 
-// Respaldo con las fotos generales de src/assets/ mientras las carpetas nuevas estén vacías
 const globFotografiaGeneral = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/*.{jpg,jpeg,png,webp}',
   { eager: true }
@@ -126,7 +125,7 @@ const resolverOrientacionOptimizada = async (
 
   const movil =
     fuenteMovil.length > 0
-      ? await optimizarLista(fuenteMovil, 900)
+      ? await optimizarLista(fuenteMovil, 860)
       : respaldoMovil;
 
   return { desktop, movil };
@@ -134,9 +133,9 @@ const resolverOrientacionOptimizada = async (
 
 const modsGeneral = aMetadatos(globFotografiaGeneral);
 const respaldoGeneralDesktop = await optimizarLista(modsGeneral, 1440);
-const respaldoGeneralMovil = await optimizarLista(modsGeneral, 900);
+const respaldoGeneralMovil = await optimizarLista(modsGeneral, 860);
 
-const fotosMusicaAssets = await optimizarLista(aMetadatos(globMusicaAssets), 380);
+const fotosMusicaAssets = await optimizarLista(aMetadatos(globMusicaAssets), 340);
 const fotosMusica = [
   ...fotosMusicaAssets,
   ...Object.keys(globMusicaPublic).map((ruta) => ruta.replace('/public', '')),
@@ -179,7 +178,7 @@ const mediaOnlineOrientados = await resolverOrientacionOptimizada(
   respaldoMovil
 );
 
-const fotosBio = await optimizarLista(aMetadatos(globBio), 900);
+const fotosBio = await optimizarLista(aMetadatos(globBio), 860);
 
 // Datos flotantes para la sección Bio
 const contactoBio = [
@@ -447,7 +446,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         background-color: var(--dial-bg);
         color: var(--dial-fg);
         transition:
-          background-color 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+          background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1),
           color 0.45s ease;
       }
 
@@ -492,8 +491,8 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         opacity: 0;
         transform: scale(1.02) translateZ(0);
         transition:
-          opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-          transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+          opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
         pointer-events: none;
         will-change: opacity, transform;
       }
@@ -512,7 +511,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           rgba(17, 17, 17, 0.44) 100%
         );
         opacity: 1;
-        transition: opacity 0.5s ease;
+        transition: opacity 0.55s ease;
         pointer-events: none;
       }
 
@@ -552,13 +551,13 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         width: 100%;
         height: 100%;
         opacity: 0;
-        transform: scale(0.96);
+        transform: scale(0.95);
         transition:
-          opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms),
+          opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms),
           transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms);
       }
 
-      .dial-musica-flotante.visible :global(.flotante-carta) {
+      .dial-musica-flotante.visible :global(.flotante-carta.cargada) {
         opacity: 1;
         transform: scale(1);
       }
@@ -767,7 +766,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         position: absolute;
         inset: 0;
         border-radius: 50%;
-        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
         pointer-events: none;
         will-change: transform;
       }
@@ -808,7 +807,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         align-items: center;
         justify-content: flex-start;
         padding-left: 22px;
-        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
         will-change: transform;
       }
 
@@ -819,9 +818,9 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         color: var(--dial-fg);
         opacity: 0.42;
         transition:
-          opacity 0.3s ease,
+          opacity 0.35s ease,
           color 0.4s ease,
-          transform 0.22s ease;
+          transform 0.25s ease;
         white-space: nowrap;
       }
 
@@ -862,7 +861,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         height: 12px;
         opacity: 0;
         transform: translate(-4px, 2px);
-        transition: opacity 0.25s ease, transform 0.25s ease;
+        transition: opacity 0.28s ease, transform 0.28s ease;
       }
 
       .dial-radio.activo .dial-flecha {
@@ -908,7 +907,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           width: var(--msize);
         }
 
-        :global(.flotante-slot:nth-child(6)) {
+        :global(.flotante-slot:nth-child(n + 5)) {
           display: none;
         }
 
@@ -980,6 +979,8 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         let rotacionAcumulada = 0;
         let capaActual = 'a';
         let ultimaImagenMostrada = fondoA.getAttribute('src') || '';
+        let fondoToken = 0;
+        let timerCambioContenido = null;
         let bloqueoScroll = false;
         let inicioToqueY = 0;
         let musicaToken = 0;
@@ -1094,16 +1095,15 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           return Array.isArray(cat.imagenes) ? cat.imagenes : [];
         };
 
-        // Carga bajo demanda de portadas
-        const cacheDecodificadas = new Map();
-        const precargarYDecodificar = (src) => {
-          if (!src) return Promise.resolve();
-          if (cacheDecodificadas.has(src)) return cacheDecodificadas.get(src);
-
-          const promesa = new Promise((resolve) => {
+        // Precarga individual sin bloquear al resto
+        const cacheCargadas = new Set();
+        const precargarImagen = (src) => {
+          if (!src || cacheCargadas.has(src)) return Promise.resolve();
+          return new Promise((resolve) => {
             const img = new Image();
             img.onload = () => {
-              if (!esDispositivoMovil() && typeof img.decode === 'function') {
+              cacheCargadas.add(src);
+              if (typeof img.decode === 'function') {
                 img.decode().then(resolve).catch(resolve);
               } else {
                 resolve();
@@ -1112,17 +1112,14 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
             img.onerror = resolve;
             img.src = src;
           });
-
-          cacheDecodificadas.set(src, promesa);
-          return promesa;
         };
 
         // Posiciones iniciales repartidas por el lienzo para Música
         const SLOTS_FLOTANTES = [
-          { x: 22, y: 28, size: 'clamp(115px, 11vw, 165px)', mx: 22, my: 24, msize: '90px' },
-          { x: 16, y: 60, size: 'clamp(135px, 14vw, 200px)', mx: 38, my: 38, msize: '104px' },
-          { x: 41, y: 46, size: 'clamp(145px, 15vw, 220px)', mx: 20, my: 54, msize: '110px' },
-          { x: 31, y: 76, size: 'clamp(105px, 10.5vw, 150px)', mx: 38, my: 70, msize: '92px' },
+          { x: 22, y: 28, size: 'clamp(115px, 11vw, 165px)', mx: 23, my: 27, msize: '92px' },
+          { x: 16, y: 60, size: 'clamp(135px, 14vw, 200px)', mx: 39, my: 44, msize: '104px' },
+          { x: 41, y: 46, size: 'clamp(145px, 15vw, 220px)', mx: 21, my: 63, msize: '108px' },
+          { x: 31, y: 76, size: 'clamp(105px, 10.5vw, 150px)', mx: 38, my: 81, msize: '90px' },
           { x: 55, y: 26, size: 'clamp(100px, 10vw, 145px)', mx: 22, my: 84, msize: '84px' },
           { x: 56, y: 70, size: 'clamp(120px, 12vw, 175px)', mx: 36, my: 85, msize: '84px' },
         ];
@@ -1135,6 +1132,16 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           }
           return copia;
         };
+
+        // Precarga progresiva y ligera en segundo plano tras arrancar la web
+        const catMusica = categorias.find((c) => c.flotante);
+        const colaMusicaPrecarga =
+          catMusica && Array.isArray(catMusica.imagenes) ? barajar(catMusica.imagenes) : [];
+
+        setTimeout(() => {
+          const lote = colaMusicaPrecarga.slice(0, esDispositivoMovil() ? 4 : 6);
+          lote.forEach((src) => precargarImagen(src));
+        }, 1400);
 
         const detenerMotorViaje = () => {
           if (rafFlotantes) {
@@ -1263,37 +1270,27 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           }
         };
 
-        const mostrarMusicaFlotante = async (lista) => {
+        const mostrarMusicaFlotante = (lista) => {
           if (!musicaFlotante || !lista || !lista.length) return;
 
           const tokenActual = ++musicaToken;
+          fondoToken += 1;
           ultimaImagenMostrada = '';
           fondoA.classList.remove('visible');
           fondoB.classList.remove('visible');
           actualizarContrasteAdaptativo(null);
 
-          const yaVisible = musicaFlotante.classList.contains('visible');
-          if (yaVisible) {
-            musicaFlotante.classList.remove('visible');
-          }
-
-          const cantidadSlots = esDispositivoMovil() ? 5 : SLOTS_FLOTANTES.length;
-          const elegidas = barajar(lista).slice(0, cantidadSlots);
-
-          await Promise.all([
-            ...elegidas.map((src) => precargarYDecodificar(src)),
-            yaVisible ? new Promise((r) => setTimeout(r, 200)) : Promise.resolve(),
-          ]);
-
-          if (tokenActual !== musicaToken) return;
-
           detenerMotorViaje();
+          musicaFlotante.classList.remove('visible');
           musicaFlotante.innerHTML = '';
           itemsFlotantes = [];
 
+          const esMovil = esDispositivoMovil();
+          const cantidadSlots = esMovil ? 4 : 5;
+          const elegidas = barajar(lista).slice(0, cantidadSlots);
+
           const ancho = musicaFlotante.clientWidth || window.innerWidth;
           const alto = musicaFlotante.clientHeight || window.innerHeight;
-          const esMovil = ancho <= 768;
 
           const anguloBase = Math.random() * Math.PI * 2;
           const pasoAngulo = (Math.PI * 2) / elegidas.length;
@@ -1311,9 +1308,22 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
             carta.style.setProperty('--enter-delay', `${i * 35}ms`);
 
             const img = document.createElement('img');
-            img.src = src;
             img.alt = '';
             img.draggable = false;
+            img.decoding = 'async';
+
+            const marcarCargada = () => {
+              if (tokenActual !== musicaToken) return;
+              cacheCargadas.add(src);
+              requestAnimationFrame(() => carta.classList.add('cargada'));
+            };
+
+            img.onload = marcarCargada;
+            img.onerror = marcarCargada;
+            img.src = src;
+            if (img.complete) {
+              marcarCargada();
+            }
 
             carta.appendChild(img);
             slot.appendChild(carta);
@@ -1599,6 +1609,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           if (!bioFlotante || !bioActivos || !contactoBio.length) return;
 
           bioToken += 1;
+          fondoToken += 1;
           ultimaImagenMostrada = '';
           fondoA.classList.remove('visible');
           fondoB.classList.remove('visible');
@@ -1705,9 +1716,12 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           return pool[Math.floor(Math.random() * pool.length)];
         };
 
+        // Fundido limpio sin microdestellos: espera a que la nueva imagen esté decodificada antes de mostrarla
         const cambiarFondo = (nuevaSrc) => {
           ocultarMusicaFlotante();
           ocultarBioFlotante();
+
+          const tokenActual = ++fondoToken;
 
           if (!nuevaSrc) {
             ultimaImagenMostrada = '';
@@ -1720,16 +1734,37 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           if (nuevaSrc === ultimaImagenMostrada) return;
           ultimaImagenMostrada = nuevaSrc;
 
-          const entrante = capaActual === 'a' ? fondoB : fondoA;
-          const saliente = capaActual === 'a' ? fondoA : fondoB;
-          capaActual = capaActual === 'a' ? 'b' : 'a';
+          const precarga = new Image();
+          const activarTransicion = () => {
+            if (tokenActual !== fondoToken) return;
 
-          entrante.src = nuevaSrc;
-          requestAnimationFrame(() => {
-            entrante.classList.add('visible');
-            saliente.classList.remove('visible');
-            actualizarContrasteAdaptativo(entrante);
-          });
+            const entrante = capaActual === 'a' ? fondoB : fondoA;
+            const saliente = capaActual === 'a' ? fondoA : fondoB;
+            capaActual = capaActual === 'a' ? 'b' : 'a';
+
+            // Quitamos la transición un instante para posicionar la nueva foto oculta sin rastro previo
+            entrante.style.transition = 'none';
+            entrante.classList.remove('visible');
+            entrante.src = nuevaSrc;
+            void entrante.offsetWidth;
+            entrante.style.transition = '';
+
+            requestAnimationFrame(() => {
+              if (tokenActual !== fondoToken) return;
+              entrante.classList.add('visible');
+              saliente.classList.remove('visible');
+              actualizarContrasteAdaptativo(entrante);
+            });
+          };
+
+          precarga.onload = () => {
+            if (typeof precarga.decode === 'function') {
+              precarga.decode().then(activarTransicion).catch(activarTransicion);
+            } else {
+              activarTransicion();
+            }
+          };
+          precarga.src = nuevaSrc;
         };
 
         // Ajusta la foto inicial de Fotografía si se entra directamente desde móvil
@@ -1792,16 +1827,26 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           });
 
           if (forzarNuevaFoto) {
-            if (cat.flotante) {
-              ocultarBioFlotante();
-              mostrarMusicaFlotante(listaImagenes);
-            } else if (cat.bioFlotante) {
-              ocultarMusicaFlotante();
-              mostrarBioFlotante();
-            } else {
-              const aleatoria = elegirImagenAleatoria(listaImagenes);
-              cambiarFondo(aleatoria);
+            if (timerCambioContenido) {
+              clearTimeout(timerCambioContenido);
             }
+
+            // Espera 80ms antes de cargar el fondo para no disparar descargas si pasas rápido por varias opciones
+            timerCambioContenido = setTimeout(() => {
+              const catFinal = categorias[indiceActivo];
+              const listaFinal = obtenerImagenesCategoria(catFinal);
+
+              if (catFinal.flotante) {
+                ocultarBioFlotante();
+                mostrarMusicaFlotante(listaFinal);
+              } else if (catFinal.bioFlotante) {
+                ocultarMusicaFlotante();
+                mostrarBioFlotante();
+              } else {
+                const aleatoria = elegirImagenAleatoria(listaFinal);
+                cambiarFondo(aleatoria);
+              }
+            }, 80);
           }
         };
 

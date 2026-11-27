@@ -1,5 +1,6 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import { getImage } from 'astro:assets';
 import '../styles/global.css';
 
 // 1. Recoge automáticamente las imágenes de cada sección
@@ -73,83 +74,112 @@ const globMusicaAssets = import.meta.glob<{ default: ImageMetadata }>(
 );
 const globMusicaPublic = import.meta.glob('/public/portadas/*.{jpg,jpeg,png,webp}');
 
-const aRutas = (globObj: Record<string, { default: ImageMetadata }>) =>
-  Object.values(globObj).map((mod) => mod.default.src);
+const aMetadatos = (globObj: Record<string, { default: ImageMetadata }>) =>
+  Object.values(globObj).map((mod) => mod.default);
 
-const resolverOrientacion = (
+const optimizarLista = async (lista: ImageMetadata[], anchoMax: number) => {
+  return Promise.all(
+    lista.map(async (img) => {
+      const opt = await getImage({
+        src: img,
+        width: Math.min(img.width, anchoMax),
+        format: 'webp',
+        quality: 78,
+      });
+      return opt.src;
+    })
+  );
+};
+
+const resolverOrientacionOptimizada = async (
   globHorizontales: Record<string, { default: ImageMetadata }>,
   globVerticales: Record<string, { default: ImageMetadata }>,
   globBase: Record<string, { default: ImageMetadata }>,
-  respaldoGeneral: string[]
+  respaldoDesktop: string[],
+  respaldoMovil: string[]
 ) => {
-  const modsBase = Object.values(globBase).map((mod) => mod.default);
-  const rutasBase = modsBase.map((img) => img.src);
-  const baseHorizontales = modsBase.filter((img) => img.width >= img.height).map((img) => img.src);
-  const baseVerticales = modsBase.filter((img) => img.height > img.width).map((img) => img.src);
+  const modsBase = aMetadatos(globBase);
+  const baseHorizontales = modsBase.filter((img) => img.width >= img.height);
+  const baseVerticales = modsBase.filter((img) => img.height > img.width);
 
-  const selHorizontales = aRutas(globHorizontales);
-  const selVerticales = aRutas(globVerticales);
+  const selHorizontales = aMetadatos(globHorizontales);
+  const selVerticales = aMetadatos(globVerticales);
 
-  const desktop =
+  const fuenteDesktop =
     selHorizontales.length > 0
       ? selHorizontales
       : baseHorizontales.length > 0
         ? baseHorizontales
-        : rutasBase.length > 0
-          ? rutasBase
-          : respaldoGeneral;
+        : modsBase;
 
-  const movil =
+  const fuenteMovil =
     selVerticales.length > 0
       ? selVerticales
       : baseVerticales.length > 0
         ? baseVerticales
-        : rutasBase.length > 0
-          ? rutasBase
-          : respaldoGeneral;
+        : modsBase;
+
+  const desktop =
+    fuenteDesktop.length > 0
+      ? await optimizarLista(fuenteDesktop, 1440)
+      : respaldoDesktop;
+
+  const movil =
+    fuenteMovil.length > 0
+      ? await optimizarLista(fuenteMovil, 900)
+      : respaldoMovil;
 
   return { desktop, movil };
 };
 
-const modsGeneral = Object.values(globFotografiaGeneral).map((mod) => mod.default);
-const todasGenerales = modsGeneral.map((img) => img.src);
+const modsGeneral = aMetadatos(globFotografiaGeneral);
+const respaldoGeneralDesktop = await optimizarLista(modsGeneral, 1440);
+const respaldoGeneralMovil = await optimizarLista(modsGeneral, 900);
 
+const fotosMusicaAssets = await optimizarLista(aMetadatos(globMusicaAssets), 380);
 const fotosMusica = [
-  ...aRutas(globMusicaAssets),
+  ...fotosMusicaAssets,
   ...Object.keys(globMusicaPublic).map((ruta) => ruta.replace('/public', '')),
 ];
 
-const respaldo = todasGenerales.length > 0 ? todasGenerales : fotosMusica;
+const respaldoDesktop =
+  respaldoGeneralDesktop.length > 0 ? respaldoGeneralDesktop : fotosMusica;
+const respaldoMovil =
+  respaldoGeneralMovil.length > 0 ? respaldoGeneralMovil : fotosMusica;
 
-const fotoOrientada = resolverOrientacion(
+const fotoOrientada = await resolverOrientacionOptimizada(
   globFotografiaHorizontales,
   globFotografiaVerticales,
   globFotografiaGeneral,
-  respaldo
+  respaldoDesktop,
+  respaldoMovil
 );
 
-const videoclipsOrientados = resolverOrientacion(
+const videoclipsOrientados = await resolverOrientacionOptimizada(
   globVideoclipsHorizontales,
   globVideoclipsVerticales,
   globVideoclips,
-  respaldo
+  respaldoDesktop,
+  respaldoMovil
 );
 
-const cortometrajesOrientados = resolverOrientacion(
+const cortometrajesOrientados = await resolverOrientacionOptimizada(
   globCortometrajesHorizontales,
   globCortometrajesVerticales,
   globCortometrajes,
-  respaldo
+  respaldoDesktop,
+  respaldoMovil
 );
 
-const mediaOnlineOrientados = resolverOrientacion(
+const mediaOnlineOrientados = await resolverOrientacionOptimizada(
   globMediaOnlineHorizontales,
   globMediaOnlineVerticales,
   globMediaOnline,
-  respaldo
+  respaldoDesktop,
+  respaldoMovil
 );
 
-const fotosBio = aRutas(globBio);
+const fotosBio = await optimizarLista(aMetadatos(globBio), 900);
 
 // Datos flotantes para la sección Bio
 const contactoBio = [
@@ -192,7 +222,7 @@ const categorias = [
     url: '/musica',
     flotante: true,
     bioFlotante: false,
-    imagenes: fotosMusica.length > 0 ? fotosMusica : respaldo,
+    imagenes: fotosMusica.length > 0 ? fotosMusica : respaldoMovil,
   },
   {
     id: 'cortometrajes',
@@ -326,6 +356,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
                   href={cat.url}
                   class="dial-opcion"
                   data-index={idx}
+                  data-astro-prefetch="viewport"
                   aria-current={idx === 0 ? 'page' : undefined}
                 >
                   <span class="dial-num">0{idx + 1}</span>
@@ -416,8 +447,8 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         background-color: var(--dial-bg);
         color: var(--dial-fg);
         transition:
-          background-color 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-          color 0.55s ease;
+          background-color 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+          color 0.45s ease;
       }
 
       /* Modo papel #f8f2ef para Música y Bio */
@@ -459,16 +490,17 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         height: 100%;
         object-fit: cover;
         opacity: 0;
-        transform: scale(1.03);
+        transform: scale(1.02) translateZ(0);
         transition:
-          opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-          transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+          opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
         pointer-events: none;
+        will-change: opacity, transform;
       }
 
       .dial-fondo-img.visible {
         opacity: 1;
-        transform: scale(1);
+        transform: scale(1) translateZ(0);
       }
 
       .dial-veladura {
@@ -480,7 +512,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           rgba(17, 17, 17, 0.44) 100%
         );
         opacity: 1;
-        transition: opacity 0.65s ease;
+        transition: opacity 0.5s ease;
         pointer-events: none;
       }
 
@@ -494,7 +526,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         inset: 0;
         pointer-events: none;
         opacity: 0;
-        transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       .dial-musica-flotante.visible {
@@ -522,8 +554,8 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         opacity: 0;
         transform: scale(0.96);
         transition:
-          opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms),
-          transform 0.55s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms);
+          opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms),
+          transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms);
       }
 
       .dial-musica-flotante.visible :global(.flotante-carta) {
@@ -532,7 +564,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
       }
 
       :global(.flotante-slot.arrastrando .flotante-carta) {
-        transition: opacity 0.3s ease, transform 0.2s ease;
+        transition: opacity 0.25s ease, transform 0.18s ease;
         transform: scale(1.03);
       }
 
@@ -543,7 +575,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         display: block;
         pointer-events: none;
         box-shadow: 0 12px 28px rgba(17, 17, 17, 0.08);
-        transition: box-shadow 0.3s ease;
+        transition: box-shadow 0.25s ease;
       }
 
       :global(.flotante-slot.arrastrando .flotante-carta img) {
@@ -556,7 +588,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         inset: 0;
         pointer-events: none;
         opacity: 0;
-        transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       .dial-bio-flotante.visible {
@@ -610,8 +642,8 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         transform: scale(0.96);
         box-shadow: 0 6px 20px rgba(17, 17, 17, 0.05);
         transition:
-          opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms),
-          transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms),
+          opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms),
+          transform 0.4s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms),
           border-color 0.25s ease,
           box-shadow 0.25s ease;
       }
@@ -647,8 +679,8 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         border-color: rgba(17, 17, 17, 0.13);
         box-shadow: 0 2px 10px rgba(17, 17, 17, 0.03);
         transition:
-          opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-          transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+          opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       :global(.bio-rastro-clon.desvanecer) {
@@ -668,7 +700,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         display: inline-flex;
         align-items: center;
         color: var(--logo-fg);
-        transition: opacity 0.2s ease, color 0.45s ease;
+        transition: opacity 0.2s ease, color 0.4s ease;
       }
 
       .dial-marca:hover {
@@ -682,7 +714,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         height: auto;
         object-fit: contain;
         filter: var(--logo-filter);
-        transition: filter 0.45s ease;
+        transition: filter 0.4s ease;
       }
 
       /* Dial giratorio en el borde derecho */
@@ -715,7 +747,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         width: 18px;
         height: 1px;
         background-color: var(--dial-fg);
-        transition: background-color 0.45s ease;
+        transition: background-color 0.4s ease;
       }
 
       .dial-rueda {
@@ -727,7 +759,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         margin-top: -280px;
         border-radius: 50%;
         border: 1px solid var(--dial-borde);
-        transition: border-color 0.45s ease;
+        transition: border-color 0.4s ease;
         pointer-events: auto;
       }
 
@@ -735,8 +767,9 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         position: absolute;
         inset: 0;
         border-radius: 50%;
-        transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
         pointer-events: none;
+        will-change: transform;
       }
 
       .dial-muesca {
@@ -747,7 +780,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         height: 1px;
         background-color: var(--dial-muesca);
         transform-origin: 280px center;
-        transition: background-color 0.45s ease;
+        transition: background-color 0.4s ease;
       }
 
       .dial-muesca.mayor {
@@ -775,7 +808,8 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         align-items: center;
         justify-content: flex-start;
         padding-left: 22px;
-        transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform;
       }
 
       .dial-opcion {
@@ -785,9 +819,9 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         color: var(--dial-fg);
         opacity: 0.42;
         transition:
-          opacity 0.35s ease,
-          color 0.45s ease,
-          transform 0.25s ease;
+          opacity 0.3s ease,
+          color 0.4s ease,
+          transform 0.22s ease;
         white-space: nowrap;
       }
 
@@ -828,7 +862,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
         height: 12px;
         opacity: 0;
         transform: translate(-4px, 2px);
-        transition: opacity 0.3s ease, transform 0.3s ease;
+        transition: opacity 0.25s ease, transform 0.25s ease;
       }
 
       .dial-radio.activo .dial-flecha {
@@ -1060,7 +1094,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           return Array.isArray(cat.imagenes) ? cat.imagenes : [];
         };
 
-        // Carga bajo demanda de portadas (evita saturar la RAM del WebView en iOS al abrir)
+        // Carga bajo demanda de portadas
         const cacheDecodificadas = new Map();
         const precargarYDecodificar = (src) => {
           if (!src) return Promise.resolve();
@@ -1248,7 +1282,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
 
           await Promise.all([
             ...elegidas.map((src) => precargarYDecodificar(src)),
-            yaVisible ? new Promise((r) => setTimeout(r, 260)) : Promise.resolve(),
+            yaVisible ? new Promise((r) => setTimeout(r, 200)) : Promise.resolve(),
           ]);
 
           if (tokenActual !== musicaToken) return;
@@ -1274,7 +1308,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
 
             const carta = document.createElement('div');
             carta.className = 'flotante-carta';
-            carta.style.setProperty('--enter-delay', `${i * 45}ms`);
+            carta.style.setProperty('--enter-delay', `${i * 35}ms`);
 
             const img = document.createElement('img');
             img.src = src;
@@ -1690,17 +1724,12 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           const saliente = capaActual === 'a' ? fondoA : fondoB;
           capaActual = capaActual === 'a' ? 'b' : 'a';
 
-          const precarga = new Image();
-          precarga.onload = () => {
-            entrante.src = nuevaSrc;
-            requestAnimationFrame(() => {
-              entrante.classList.add('visible');
-              saliente.classList.remove('visible');
-              saliente.removeAttribute('src');
-              actualizarContrasteAdaptativo(entrante);
-            });
-          };
-          precarga.src = nuevaSrc;
+          entrante.src = nuevaSrc;
+          requestAnimationFrame(() => {
+            entrante.classList.add('visible');
+            saliente.classList.remove('visible');
+            actualizarContrasteAdaptativo(entrante);
+          });
         };
 
         // Ajusta la foto inicial de Fotografía si se entra directamente desde móvil
@@ -1834,7 +1863,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
 
             setTimeout(() => {
               bloqueoScroll = false;
-            }, 260);
+            }, 180);
           },
           { passive: false }
         );

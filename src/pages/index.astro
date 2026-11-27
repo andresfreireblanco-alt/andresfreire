@@ -239,7 +239,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Andrés Freire</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -964,13 +964,19 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
 
         const PASO_GRADOS = 22;
 
-        // Análisis de luminancia para adaptar logo y dial al fondo
-        const canvasMuestreo = document.createElement('canvas');
-        canvasMuestreo.width = 48;
-        canvasMuestreo.height = 48;
-        const ctxMuestreo = canvasMuestreo.getContext('2d', { willReadFrequently: true });
+        // Análisis de luminancia solo en escritorio para ahorrar memoria gráfica en móvil/WebView
+        const esDispositivoMovil = () => window.innerWidth <= 768;
+        let canvasMuestreo = null;
+        let ctxMuestreo = null;
 
         const calcularLuminanciaZona = (imgEl, normX, normY, normW, normH) => {
+          if (esDispositivoMovil()) return null;
+          if (!canvasMuestreo) {
+            canvasMuestreo = document.createElement('canvas');
+            canvasMuestreo.width = 32;
+            canvasMuestreo.height = 32;
+            ctxMuestreo = canvasMuestreo.getContext('2d', { willReadFrequently: true });
+          }
           if (!ctxMuestreo || !imgEl || !imgEl.complete || !imgEl.naturalWidth || !imgEl.naturalHeight) {
             return null;
           }
@@ -1019,7 +1025,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
 
         const actualizarContrasteAdaptativo = (imgActiva = null) => {
           const esModoClaroFijo = pantalla.classList.contains('modo-claro');
-          if (esModoClaroFijo) {
+          if (esModoClaroFijo || esDispositivoMovil()) {
             pantalla.classList.remove('logo-sobre-claro', 'dial-sobre-claro');
             return;
           }
@@ -1054,7 +1060,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           return Array.isArray(cat.imagenes) ? cat.imagenes : [];
         };
 
-        // Precargamos y decodificamos en segundo plano todas las portadas de Música
+        // Carga bajo demanda de portadas (evita saturar la RAM del WebView en iOS al abrir)
         const cacheDecodificadas = new Map();
         const precargarYDecodificar = (src) => {
           if (!src) return Promise.resolve();
@@ -1063,7 +1069,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           const promesa = new Promise((resolve) => {
             const img = new Image();
             img.onload = () => {
-              if (typeof img.decode === 'function') {
+              if (!esDispositivoMovil() && typeof img.decode === 'function') {
                 img.decode().then(resolve).catch(resolve);
               } else {
                 resolve();
@@ -1076,11 +1082,6 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
           cacheDecodificadas.set(src, promesa);
           return promesa;
         };
-
-        const catMusica = categorias.find((c) => c.flotante);
-        if (catMusica && Array.isArray(catMusica.imagenes)) {
-          catMusica.imagenes.forEach((src) => precargarYDecodificar(src));
-        }
 
         // Posiciones iniciales repartidas por el lienzo para Música
         const SLOTS_FLOTANTES = [
@@ -1242,7 +1243,8 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
             musicaFlotante.classList.remove('visible');
           }
 
-          const elegidas = barajar(lista).slice(0, SLOTS_FLOTANTES.length);
+          const cantidadSlots = esDispositivoMovil() ? 5 : SLOTS_FLOTANTES.length;
+          const elegidas = barajar(lista).slice(0, cantidadSlots);
 
           await Promise.all([
             ...elegidas.map((src) => precargarYDecodificar(src)),
@@ -1694,6 +1696,7 @@ const muescas = Array.from({ length: 48 }, (_, i) => i * (360 / 48));
             requestAnimationFrame(() => {
               entrante.classList.add('visible');
               saliente.classList.remove('visible');
+              saliente.removeAttribute('src');
               actualizarContrasteAdaptativo(entrante);
             });
           };
